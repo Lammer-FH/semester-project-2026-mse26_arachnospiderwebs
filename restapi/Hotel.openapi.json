@@ -236,7 +236,7 @@
           "Availability"
         ],
         "summary": "Verfügbarkeit prüfen",
-        "description": "Prüft, ob ein bestimmtes Zimmer im gewünschten Zeitraum verfügbar ist.\n\n**Validierungsregeln:**\n- `checkIn` darf nicht in der Vergangenheit liegen\n- `checkOut` muss nach `checkIn` liegen\n- Maximaler Buchungszeitraum: 30 Nächte",
+        "description": "Prüft, ob ein bestimmtes Zimmer im gewünschten Zeitraum verfügbar ist.\n\n**Validierungsregeln:**\n- `checkIn` darf nicht in der Vergangenheit liegen\n- `checkOut` muss nach `checkIn` liegen, oder gleich `checkIn` sein (gleicher Tag = 1 Nacht)\n- Maximaler Buchungszeitraum: 30 Nächte",
         "operationId": "checkRoomAvailability",
         "parameters": [
           {
@@ -327,7 +327,7 @@
           "Bookings"
         ],
         "summary": "Buchung erstellen",
-        "description": "Erstellt eine neue Buchung für ein verfügbares Zimmer.\n\n**Validierungsregeln:**\n- `firstName`: nicht leer, max. 100 Zeichen\n- `lastName`: nicht leer, max. 100 Zeichen\n- `email`: gültiges E-Mail-Format\n- `roomId`: muss existierendes Zimmer referenzieren\n- `checkIn` darf nicht in der Vergangenheit liegen\n- `checkOut` muss nach `checkIn` liegen\n- Maximaler Buchungszeitraum: 30 Nächte\n- Zimmer muss im gewählten Zeitraum verfügbar sein",
+        "description": "Erstellt eine neue Buchung für ein verfügbares Zimmer.\n\n**Validierungsregeln:**\n- `firstName`: nicht leer, max. 100 Zeichen\n- `lastName`: nicht leer, max. 100 Zeichen\n- `email`: gültiges E-Mail-Format\n- `roomId`: muss existierendes Zimmer referenzieren\n- `checkIn` darf nicht in der Vergangenheit liegen\n- `checkOut` muss nach `checkIn` liegen, oder gleich `checkIn` sein (gleicher Tag = 1 Nacht)\n- Maximaler Buchungszeitraum: 30 Nächte\n- Zimmer muss im gewählten Zeitraum verfügbar sein",
         "operationId": "createBooking",
         "requestBody": {
           "required": true,
@@ -805,7 +805,7 @@
           "checkOut": {
             "type": "string",
             "format": "date",
-            "description": "Muss nach checkIn liegen. Maximaler Zeitraum: 30 Nächte.",
+            "description": "Abreisedatum. Darf gleich checkIn sein (= 1 Nacht). Maximaler Zeitraum: 30 Nächte.",
             "example": "2026-07-05"
           },
           "firstName": {

@@ -440,3 +440,220 @@ Buchungsformular
     └── GET /bookings/{id}                        (Use Case 6)
         └── DELETE /bookings/{id}                 (Use Case 7)
 ```
+
+---
+
+## Edge Cases
+
+> Die folgenden Edge Cases basieren auf der bestehenden API. Wo die API eine klare Antwort liefert wird das UI-Verhalten beschrieben. Offene Punkte sind explizit markiert.
+
+---
+
+### Edge Case 1 – Keine Zimmer im gewählten Zeitraum verfügbar
+
+**Szenario:** Der User wählt einen Zeitraum in dem alle Zimmer ausgebucht sind.
+
+### API Call
+
+```http
+GET /api/v1/rooms?page=0&size=5&checkIn=2026-12-24&checkOut=2026-12-26
+```
+
+### Response
+
+```json
+{
+  "content": [],
+  "totalElements": 0,
+  "totalPages": 0,
+  "currentPage": 0,
+  "hasNextPage": false,
+  "hasPreviousPage": false
+}
+```
+
+### UI-Verhalten
+
+- `content` ist leer → Hinweis anzeigen: „Für den gewählten Zeitraum sind keine Zimmer verfügbar"
+- Kein Paginations-Button anzeigen
+- Datum-Auswahl für den User zugänglich lassen damit er einen anderen Zeitraum wählen kann
+
+---
+
+### Edge Case 2 – checkIn gleich checkOut (1 Nacht)
+
+**Szenario:** Der User wählt dasselbe Datum für An- und Abreise. Das entspricht einer Buchung von einer Nacht (z.B. 21.12. auf 22.12.).
+
+### API Call
+
+```http
+GET /api/v1/rooms/1/availability?checkIn=2026-12-21&checkOut=2026-12-21
+```
+
+### Response
+
+```json
+{
+  "roomId": 1,
+  "roomTitle": "Deluxe Suite",
+  "checkIn": "2026-12-21",
+  "checkOut": "2026-12-21",
+  "available": true,
+  "nights": 1,
+  "totalPrice": 149.0
+}
+```
+
+### UI-Verhalten
+
+- `nights: 1` anzeigen – nicht 0
+- Gesamtpreis für 1 Nacht anzeigen
+- Kein Fehler, kein Hinweis notwendig – valider Buchungsfall
+
+---
+
+### Edge Case 3 – Zimmer wird zwischen Verfügbarkeitsprüfung und Buchung weggebucht (TOCTOU)
+
+**Szenario:** Der User prüft die Verfügbarkeit (`available: true`), füllt das Formular aus, und in der Zwischenzeit bucht jemand anderes dasselbe Zimmer. Der darauffolgende `POST /bookings` schlägt mit 409 fehl.
+
+### Ablauf
+
+```
+GET /rooms/1/availability  →  available: true
+[User füllt Formular aus – Zeitverzögerung]
+POST /bookings             →  409 Conflict
+```
+
+### Response (409)
+
+```json
+{
+  "status": 409,
+  "error": "Conflict",
+  "message": "Room is no longer available for the selected dates"
+}
+```
+
+### UI-Verhalten
+
+- Fehlermeldung anzeigen: „Dieses Zimmer wurde soeben von jemand anderem gebucht"
+- Zurück zur Zimmerübersicht mit dem gewählten Zeitraum (`GET /rooms?checkIn=...&checkOut=...`)
+- Verfügbare Alternativen direkt anzeigen
+
+---
+
+### Edge Case 4 – Doppelter Submit (langsame Verbindung / Doppelklick)
+
+**Szenario:** Der User klickt den „Jetzt buchen"-Button zweimal, oder die Verbindung ist langsam und der erste Request scheint nicht abzuschicken. Die API hat keinen Duplikatschutz – zwei Requests erzeugen zwei Buchungen.
+
+### UI-Verhalten
+
+- Submit-Button nach dem ersten Klick sofort deaktivieren
+- Ladeindikator anzeigen bis die Response eintrifft
+- Erst nach 201 oder Fehler den Button wieder aktivieren
+
+> **Hinweis:** Die API selbst hat keinen Idempotency-Mechanismus. Der Schutz liegt vollständig bei der UI.
+
+---
+
+### Edge Case 5 – Buchung nicht gefunden (ungültige UUID)
+
+**Szenario:** Der User ruft eine Buchungsbestätigung über einen fehlerhaften oder abgelaufenen Link auf.
+
+### API Call
+
+```http
+GET /api/v1/bookings/00000000-0000-0000-0000-000000000000
+```
+
+### Response (404)
+
+```json
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "Booking not found",
+  "path": "/api/v1/bookings/00000000-0000-0000-0000-000000000000"
+}
+```
+
+### UI-Verhalten
+
+- Hinweis anzeigen: „Buchung nicht gefunden"
+- Link zur Startseite anbieten
+
+---
+
+### Edge Case 6 – Zimmer nicht gefunden (ungültige ID)
+
+**Szenario:** Der User ruft eine Zimmerdetailseite über eine nicht existierende ID auf (z.B. manuell eingetippte URL).
+
+### API Call
+
+```http
+GET /api/v1/rooms/9999
+```
+
+### Response (404)
+
+```json
+{
+  "status": 404,
+  "error": "Not Found",
+  "message": "Room not found",
+  "path": "/api/v1/rooms/9999"
+}
+```
+
+### UI-Verhalten
+
+- Hinweis anzeigen: „Dieses Zimmer existiert nicht"
+- Zurück zur Zimmerübersicht
+
+---
+
+### Edge Case 7 – Serverfehler (500)
+
+**Szenario:** Das Backend hat einen internen Fehler – bei jedem Endpoint möglich.
+
+### Response (500)
+
+```json
+{
+  "status": 500,
+  "error": "Internal Server Error",
+  "message": "An unexpected error occurred"
+}
+```
+
+### UI-Verhalten
+
+- Generische Fehlermeldung anzeigen: „Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es später erneut."
+- Keine technischen Details (Stack Trace, Message) an den User weitergeben
+- Bei kritischen Aktionen (z.B. `POST /bookings`): explizit darauf hinweisen dass die Buchung möglicherweise nicht abgeschlossen wurde
+
+---
+
+### Edge Case 8 – Datumsvalidierung schlägt fehl
+
+**Szenario:** Der User umgeht die UI-Validierung oder die UI hat einen Fehler. Das Backend antwortet mit 400.
+
+| Fehlerfall | Backend-Reaktion | UI-Hinweis |
+|---|---|---|
+| `checkIn` in der Vergangenheit | 400 | „Anreisedatum darf nicht in der Vergangenheit liegen" |
+| `checkOut` vor `checkIn` | 400 | „Abreisedatum muss nach dem Anreisedatum liegen" |
+| Mehr als 30 Nächte | 400 | „Maximaler Buchungszeitraum ist 30 Nächte" |
+
+### UI-Verhalten
+
+- `fieldErrors` aus der 400-Response auslesen und beim jeweiligen Feld anzeigen
+- Diese Fälle sollten durch UI-Validierung gar nicht erst den Backend erreichen – die 400-Behandlung ist die letzte Absicherung
+
+---
+
+### Offene Punkte (Spec-Lücken)
+
+| Thema | Problem | Empfehlung |
+|---|---|---|
+| Stornierung vergangener Buchungen | Spec definiert nicht ob `DELETE` auf eine abgelaufene Buchung erlaubt ist | Backend sollte prüfen ob `checkOut` in der Vergangenheit liegt und ggf. 409 zurückgeben |
+| Syntaktisch ungültige UUID im Pfad | `GET /bookings/abc` ist keine gültige UUID – unklar ob 400 oder 404 | Backend sollte 400 zurückgeben, Spec sollte das dokumentieren |
