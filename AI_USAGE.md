@@ -38,3 +38,19 @@
 ---
 
 > **Legende:** ✅ akzeptiert · 🔄 modifiziert · ❌ abgelehnt
+
+### 7 · DB-Design bewerten & SQLite File generieren
+**Task:** Bestehendes DB-Design gegen API v2.0.0 prüfen, SQLite File + ERD erstellen  
+**Result:** Teilweise akzeptiert  
+- ✅ Diskrepanzen identifiziert: `booking.id` → UUID, `room.image` → `image_url`, fehlendes `status`-Feld, fehlerhafte Availability-Query bei `checkIn === checkOut`
+- ✅ SQLite Schema + Testdaten generiert
+- ✅ ERD via mermaid.js mit Legende und Beispielbuchung
+- ❌ Frühstück als eigene `booking_option`-Tabelle → MVP-Entscheidung, bleibt als `BOOLEAN`
+
+### 8 · AI_USAGE.md dokumentieren
+**Task:** AI Usage für DB-Session nachführen  
+**Result:** ✅ Vollständig akzeptiert
+
+### 9 · DB_Design.md erstellen
+**Task:** Aktualisierte `DB_Design.md` basierend auf API v2 und SQLite-Schema erstellen  
+**Result:** ✅ Vollständig akzeptiert
