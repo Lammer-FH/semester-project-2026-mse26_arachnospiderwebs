@@ -3,7 +3,7 @@
   "info": {
     "title": "Boutique Hotel Technikum – Booking API",
     "description": "REST API für die Buchungs-App des Hotel Technikum. Gäste können Hotelzimmer durchsuchen, Verfügbarkeit prüfen und Zimmer buchen.",
-    "version": "1.0.0"
+    "version": "2.0.0"
   },
   "servers": [
     {
@@ -22,15 +22,17 @@
     },
     {
       "name": "Bookings",
-      "description": "Buchungen erstellen und abrufen (U4, U5)"
+      "description": "Buchungen erstellen, abrufen und stornieren (U4, U5)"
     }
   ],
   "paths": {
     "/rooms": {
       "get": {
-        "tags": ["Rooms"],
+        "tags": [
+          "Rooms"
+        ],
         "summary": "Paginierte Zimmerliste",
-        "description": "Gibt eine paginierte Liste aller Hotelzimmer zurück. Standardmäßig 5 Zimmer pro Seite.",
+        "description": "Gibt eine paginierte Liste aller Hotelzimmer zurück.\n\nWenn `checkIn` und `checkOut` angegeben werden, enthält jedes Zimmer direkt seinen Verfügbarkeitsstatus und den Gesamtpreis – so wird ein separater Availability-Request pro Zimmer vermieden.",
         "operationId": "getRooms",
         "parameters": [
           {
@@ -54,6 +56,28 @@
               "default": 5,
               "minimum": 1
             }
+          },
+          {
+            "name": "checkIn",
+            "in": "query",
+            "description": "Anreisedatum (Format: YYYY-MM-DD). Wenn angegeben, muss auch checkOut angegeben werden.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-07-01"
+            }
+          },
+          {
+            "name": "checkOut",
+            "in": "query",
+            "description": "Abreisedatum (Format: YYYY-MM-DD). Wenn angegeben, muss auch checkIn angegeben werden.",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2026-07-05"
+            }
           }
         ],
         "responses": {
@@ -64,28 +88,76 @@
                 "schema": {
                   "$ref": "#/components/schemas/RoomPage"
                 },
-                "example": {
-                  "content": [
-                    {
-                      "id": 1,
-                      "title": "Deluxe Suite",
-                      "description": "Geräumige Suite mit Balkon und Bergblick.",
-                      "image": "/images/rooms/1.jpg",
-                      "pricePerNight": 149.0,
-                      "extras": [
-                        { "id": 1, "name": "WiFi", "icon": "wifi" },
-                        { "id": 2, "name": "Minibar", "icon": "cup-hot" },
-                        { "id": 3, "name": "Balkon", "icon": "door-open" }
-                      ]
+                "examples": {
+                  "withoutAvailability": {
+                    "summary": "Ohne Datumsfilter",
+                    "value": {
+                      "content": [
+                        {
+                          "id": 1,
+                          "title": "Deluxe Suite",
+                          "description": "Geräumige Suite mit Balkon und Bergblick.",
+                          "imageUrl": "https://hotel-technikum.at/images/rooms/1.jpg",
+                          "pricePerNight": 149.0,
+                          "extras": [
+                            {
+                              "id": 1,
+                              "name": "WiFi",
+                              "icon": "wifi"
+                            },
+                            {
+                              "id": 2,
+                              "name": "Minibar",
+                              "icon": "cup-hot"
+                            }
+                          ],
+                          "availability": null
+                        }
+                      ],
+                      "totalElements": 12,
+                      "totalPages": 3,
+                      "currentPage": 0,
+                      "hasNextPage": true,
+                      "hasPreviousPage": false
                     }
-                  ],
-                  "totalElements": 12,
-                  "totalPages": 3,
-                  "currentPage": 0,
-                  "pageSize": 5
+                  },
+                  "withAvailability": {
+                    "summary": "Mit Datumsfilter",
+                    "value": {
+                      "content": [
+                        {
+                          "id": 1,
+                          "title": "Deluxe Suite",
+                          "description": "Geräumige Suite mit Balkon und Bergblick.",
+                          "imageUrl": "https://hotel-technikum.at/images/rooms/1.jpg",
+                          "pricePerNight": 149.0,
+                          "extras": [
+                            {
+                              "id": 1,
+                              "name": "WiFi",
+                              "icon": "wifi"
+                            }
+                          ],
+                          "availability": {
+                            "available": true,
+                            "nights": 4,
+                            "totalPrice": 596.0
+                          }
+                        }
+                      ],
+                      "totalElements": 12,
+                      "totalPages": 3,
+                      "currentPage": 0,
+                      "hasNextPage": true,
+                      "hasPreviousPage": false
+                    }
+                  }
                 }
               }
             }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -95,7 +167,9 @@
     },
     "/rooms/{id}": {
       "get": {
-        "tags": ["Rooms"],
+        "tags": [
+          "Rooms"
+        ],
         "summary": "Zimmerdetails",
         "description": "Gibt die Details eines einzelnen Zimmers zurück.",
         "operationId": "getRoomById",
@@ -123,13 +197,26 @@
                   "id": 1,
                   "title": "Deluxe Suite",
                   "description": "Geräumige Suite mit Balkon und Bergblick.",
-                  "image": "/images/rooms/1.jpg",
+                  "imageUrl": "https://hotel-technikum.at/images/rooms/1.jpg",
                   "pricePerNight": 149.0,
                   "extras": [
-                    { "id": 1, "name": "WiFi", "icon": "wifi" },
-                    { "id": 2, "name": "Minibar", "icon": "cup-hot" },
-                    { "id": 3, "name": "Balkon", "icon": "door-open" }
-                  ]
+                    {
+                      "id": 1,
+                      "name": "WiFi",
+                      "icon": "wifi"
+                    },
+                    {
+                      "id": 2,
+                      "name": "Minibar",
+                      "icon": "cup-hot"
+                    },
+                    {
+                      "id": 3,
+                      "name": "Balkon",
+                      "icon": "door-open"
+                    }
+                  ],
+                  "availability": null
                 }
               }
             }
@@ -145,7 +232,9 @@
     },
     "/rooms/{id}/availability": {
       "get": {
-        "tags": ["Availability"],
+        "tags": [
+          "Availability"
+        ],
         "summary": "Verfügbarkeit prüfen",
         "description": "Prüft, ob ein bestimmtes Zimmer im gewünschten Zeitraum verfügbar ist.\n\n**Validierungsregeln:**\n- `checkIn` darf nicht in der Vergangenheit liegen\n- `checkOut` muss nach `checkIn` liegen\n- Maximaler Buchungszeitraum: 30 Nächte",
         "operationId": "checkRoomAvailability",
@@ -185,7 +274,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Verfügbarkeit erfolgreich geprüft (Zimmer kann verfügbar oder nicht verfügbar sein)",
+            "description": "Verfügbarkeit erfolgreich geprüft",
             "content": {
               "application/json": {
                 "schema": {
@@ -234,9 +323,11 @@
     },
     "/bookings": {
       "post": {
-        "tags": ["Bookings"],
+        "tags": [
+          "Bookings"
+        ],
         "summary": "Buchung erstellen",
-        "description": "Erstellt eine neue Buchung für ein verfügbares Zimmer.\n\n**Validierungsregeln:**\n- `firstName`: nicht leer, max. 100 Zeichen\n- `lastName`: nicht leer, max. 100 Zeichen\n- `email`: gültiges E-Mail-Format\n- `emailConfirm`: muss mit `email` übereinstimmen\n- `breakfast`: boolean, Pflichtfeld\n- `roomId`: muss existierendes Zimmer referenzieren\n- `checkIn` / `checkOut`: gültig, Zimmer muss im Zeitraum verfügbar sein",
+        "description": "Erstellt eine neue Buchung für ein verfügbares Zimmer.\n\n**Validierungsregeln:**\n- `firstName`: nicht leer, max. 100 Zeichen\n- `lastName`: nicht leer, max. 100 Zeichen\n- `email`: gültiges E-Mail-Format\n- `roomId`: muss existierendes Zimmer referenzieren\n- `checkIn` darf nicht in der Vergangenheit liegen\n- `checkOut` muss nach `checkIn` liegen\n- Maximaler Buchungszeitraum: 30 Nächte\n- Zimmer muss im gewählten Zeitraum verfügbar sein",
         "operationId": "createBooking",
         "requestBody": {
           "required": true,
@@ -252,7 +343,6 @@
                 "firstName": "Max",
                 "lastName": "Mustermann",
                 "email": "max@example.com",
-                "emailConfirm": "max@example.com",
                 "breakfast": true
               }
             }
@@ -267,24 +357,32 @@
                   "$ref": "#/components/schemas/BookingResponse"
                 },
                 "example": {
-                  "id": 42,
+                  "id": "a3f1c2d4-e5b6-7890-abcd-ef1234567890",
                   "room": {
                     "id": 1,
                     "title": "Deluxe Suite",
                     "description": "Geräumige Suite mit Balkon und Bergblick.",
-                    "image": "/images/rooms/1.jpg",
+                    "imageUrl": "https://hotel-technikum.at/images/rooms/1.jpg",
                     "pricePerNight": 149.0,
-                    "extras": [{ "id": 1, "name": "WiFi", "icon": "wifi" }]
+                    "extras": [
+                      {
+                        "id": 1,
+                        "name": "WiFi",
+                        "icon": "wifi"
+                      }
+                    ],
+                    "availability": null
                   },
                   "checkIn": "2026-07-01",
                   "checkOut": "2026-07-05",
                   "nights": 4,
-                  "breakfast": true,
                   "firstName": "Max",
                   "lastName": "Mustermann",
                   "email": "max@example.com",
-                  "totalPrice": 596.0,
-                  "createdAt": "2026-05-04T14:30:00Z"
+                  "totalPrice": 626.0,
+                  "status": "CONFIRMED",
+                  "createdAt": "2026-05-04T14:30:00Z",
+                  "breakfast": true
                 }
               }
             }
@@ -302,8 +400,10 @@
                   "error": "Bad Request",
                   "message": "Validation failed",
                   "fieldErrors": [
-                    { "field": "email", "message": "must be a valid email address" },
-                    { "field": "emailConfirm", "message": "email addresses do not match" }
+                    {
+                      "field": "email",
+                      "message": "must be a valid email address"
+                    }
                   ],
                   "path": "/api/v1/bookings"
                 }
@@ -324,7 +424,9 @@
     },
     "/bookings/{id}": {
       "get": {
-        "tags": ["Bookings"],
+        "tags": [
+          "Bookings"
+        ],
         "summary": "Buchungsbestätigung abrufen",
         "description": "Gibt die vollständige Buchungsbestätigung zurück inkl. Hotelinformationen.",
         "operationId": "getBookingById",
@@ -332,11 +434,11 @@
           {
             "name": "id",
             "in": "path",
-            "description": "ID der Buchung",
+            "description": "UUID der Buchung",
             "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int64"
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -349,23 +451,30 @@
                   "$ref": "#/components/schemas/BookingConfirmation"
                 },
                 "example": {
-                  "id": 42,
+                  "id": "a3f1c2d4-e5b6-7890-abcd-ef1234567890",
                   "room": {
                     "id": 1,
                     "title": "Deluxe Suite",
                     "description": "Geräumige Suite mit Balkon und Bergblick.",
-                    "image": "/images/rooms/1.jpg",
+                    "imageUrl": "https://hotel-technikum.at/images/rooms/1.jpg",
                     "pricePerNight": 149.0,
-                    "extras": [{ "id": 1, "name": "WiFi", "icon": "wifi" }]
+                    "extras": [
+                      {
+                        "id": 1,
+                        "name": "WiFi",
+                        "icon": "wifi"
+                      }
+                    ],
+                    "availability": null
                   },
                   "checkIn": "2026-07-01",
                   "checkOut": "2026-07-05",
                   "nights": 4,
-                  "breakfast": true,
                   "firstName": "Max",
                   "lastName": "Mustermann",
                   "email": "max@example.com",
-                  "totalPrice": 596.0,
+                  "totalPrice": 626.0,
+                  "status": "CONFIRMED",
                   "createdAt": "2026-05-04T14:30:00Z",
                   "hotel": {
                     "name": "Boutique Hotel Technikum",
@@ -377,13 +486,108 @@
                       "lat": 48.2392,
                       "lng": 16.378
                     }
-                  }
+                  },
+                  "breakfast": true
                 }
               }
             }
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Bookings"
+        ],
+        "summary": "Buchung stornieren",
+        "description": "Storniert eine bestehende Buchung. Eine bereits stornierte Buchung kann nicht erneut storniert werden (409).",
+        "operationId": "cancelBooking",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "UUID der Buchung",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Buchung erfolgreich storniert",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BookingConfirmation"
+                },
+                "example": {
+                  "id": "a3f1c2d4-e5b6-7890-abcd-ef1234567890",
+                  "room": {
+                    "id": 1,
+                    "title": "Deluxe Suite",
+                    "description": "Geräumige Suite mit Balkon und Bergblick.",
+                    "imageUrl": "https://hotel-technikum.at/images/rooms/1.jpg",
+                    "pricePerNight": 149.0,
+                    "extras": [
+                      {
+                        "id": 1,
+                        "name": "WiFi",
+                        "icon": "wifi"
+                      }
+                    ],
+                    "availability": null
+                  },
+                  "checkIn": "2026-07-01",
+                  "checkOut": "2026-07-05",
+                  "nights": 4,
+                  "firstName": "Max",
+                  "lastName": "Mustermann",
+                  "email": "max@example.com",
+                  "totalPrice": 626.0,
+                  "status": "CANCELLED",
+                  "createdAt": "2026-05-04T14:30:00Z",
+                  "hotel": {
+                    "name": "Boutique Hotel Technikum",
+                    "address": "Höchstädtplatz 6, 1200 Wien",
+                    "phone": "+43 1 XXXXXXX",
+                    "email": "info@hotel-technikum.at",
+                    "directions": "U6 Station Dresdner Straße, 2 Minuten Fußweg",
+                    "coordinates": {
+                      "lat": 48.2392,
+                      "lng": 16.378
+                    }
+                  },
+                  "breakfast": true
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "description": "Buchung ist bereits storniert",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                },
+                "example": {
+                  "timestamp": "2026-05-04T14:30:00Z",
+                  "status": 409,
+                  "error": "Conflict",
+                  "message": "Booking is already cancelled",
+                  "path": "/api/v1/bookings/a3f1c2d4-e5b6-7890-abcd-ef1234567890"
+                }
+              }
+            }
           },
           "500": {
             "$ref": "#/components/responses/InternalServerError"
@@ -412,7 +616,36 @@
             "example": "wifi"
           }
         },
-        "required": ["id", "name", "icon"]
+        "required": [
+          "id",
+          "name",
+          "icon"
+        ]
+      },
+      "RoomAvailabilitySummary": {
+        "type": "object",
+        "description": "Eingebettete Verfügbarkeitsinfo – nur gesetzt wenn GET /rooms mit checkIn/checkOut aufgerufen wurde",
+        "properties": {
+          "available": {
+            "type": "boolean",
+            "example": true
+          },
+          "nights": {
+            "type": "integer",
+            "example": 4
+          },
+          "totalPrice": {
+            "type": "number",
+            "format": "double",
+            "nullable": true,
+            "description": "Gesamtpreis in EUR. Null wenn nicht verfügbar.",
+            "example": 596.0
+          }
+        },
+        "required": [
+          "available",
+          "nights"
+        ]
       },
       "Room": {
         "type": "object",
@@ -431,9 +664,11 @@
             "type": "string",
             "example": "Geräumige Suite mit Balkon und Bergblick."
           },
-          "image": {
+          "imageUrl": {
             "type": "string",
-            "example": "/images/rooms/1.jpg"
+            "format": "uri",
+            "description": "Absolute URL zum Zimmerbild",
+            "example": "https://hotel-technikum.at/images/rooms/1.jpg"
           },
           "pricePerNight": {
             "type": "number",
@@ -445,9 +680,25 @@
             "items": {
               "$ref": "#/components/schemas/Extra"
             }
+          },
+          "availability": {
+            "nullable": true,
+            "description": "Nur befüllt wenn GET /rooms mit checkIn und checkOut aufgerufen wurde. Sonst null.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RoomAvailabilitySummary"
+              }
+            ]
           }
         },
-        "required": ["id", "title", "description", "image", "pricePerNight", "extras"]
+        "required": [
+          "id",
+          "title",
+          "description",
+          "imageUrl",
+          "pricePerNight",
+          "extras"
+        ]
       },
       "RoomPage": {
         "type": "object",
@@ -471,12 +722,23 @@
             "type": "integer",
             "example": 0
           },
-          "pageSize": {
-            "type": "integer",
-            "example": 5
+          "hasNextPage": {
+            "type": "boolean",
+            "example": true
+          },
+          "hasPreviousPage": {
+            "type": "boolean",
+            "example": false
           }
         },
-        "required": ["content", "totalElements", "totalPages", "currentPage", "pageSize"]
+        "required": [
+          "content",
+          "totalElements",
+          "totalPages",
+          "currentPage",
+          "hasNextPage",
+          "hasPreviousPage"
+        ]
       },
       "AvailabilityResponse": {
         "type": "object",
@@ -517,11 +779,18 @@
             "example": 596.0
           }
         },
-        "required": ["roomId", "roomTitle", "checkIn", "checkOut", "available", "nights"]
+        "required": [
+          "roomId",
+          "roomTitle",
+          "checkIn",
+          "checkOut",
+          "available",
+          "nights"
+        ]
       },
       "BookingRequest": {
         "type": "object",
-        "description": "Anfrage zur Erstellung einer Buchung",
+        "description": "Anfrage zur Erstellung einer Buchung. Der totalPrice wird vom Backend berechnet und beinhaltet ggf. den Frühstücksaufpreis.",
         "properties": {
           "roomId": {
             "type": "integer",
@@ -536,6 +805,7 @@
           "checkOut": {
             "type": "string",
             "format": "date",
+            "description": "Muss nach checkIn liegen. Maximaler Zeitraum: 30 Nächte.",
             "example": "2026-07-05"
           },
           "firstName": {
@@ -553,14 +823,9 @@
             "format": "email",
             "example": "max@example.com"
           },
-          "emailConfirm": {
-            "type": "string",
-            "format": "email",
-            "description": "Muss mit dem Feld `email` übereinstimmen",
-            "example": "max@example.com"
-          },
           "breakfast": {
             "type": "boolean",
+            "description": "Frühstück gewünscht. Beeinflusst den totalPrice – der genaue Aufpreis wird vom Backend berechnet.",
             "example": true
           }
         },
@@ -571,18 +836,27 @@
           "firstName",
           "lastName",
           "email",
-          "emailConfirm",
           "breakfast"
         ]
       },
+      "BookingStatus": {
+        "type": "string",
+        "description": "Status der Buchung",
+        "enum": [
+          "CONFIRMED",
+          "CANCELLED"
+        ],
+        "example": "CONFIRMED"
+      },
       "BookingResponse": {
         "type": "object",
-        "description": "Erstellte Buchung",
+        "description": "Erstellte oder abgerufene Buchung",
         "properties": {
           "id": {
-            "type": "integer",
-            "format": "int64",
-            "example": 42
+            "type": "string",
+            "format": "uuid",
+            "description": "Eindeutige UUID der Buchung",
+            "example": "a3f1c2d4-e5b6-7890-abcd-ef1234567890"
           },
           "room": {
             "$ref": "#/components/schemas/Room"
@@ -601,10 +875,6 @@
             "type": "integer",
             "example": 4
           },
-          "breakfast": {
-            "type": "boolean",
-            "example": true
-          },
           "firstName": {
             "type": "string",
             "example": "Max"
@@ -621,17 +891,37 @@
           "totalPrice": {
             "type": "number",
             "format": "double",
+            "description": "Gesamtpreis in EUR inkl. Frühstücksaufpreis wenn gebucht.",
             "example": 596.0
+          },
+          "breakfast": {
+            "type": "boolean",
+            "description": "Gibt an ob Frühstück gebucht wurde.",
+            "example": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/BookingStatus"
           },
           "createdAt": {
             "type": "string",
             "format": "date-time",
+            "description": "Erstellungszeitpunkt der Buchung. Immer in UTC (Z).",
             "example": "2026-05-04T14:30:00Z"
           }
         },
         "required": [
-          "id", "room", "checkIn", "checkOut", "nights",
-          "breakfast", "firstName", "lastName", "email", "totalPrice", "createdAt"
+          "id",
+          "room",
+          "checkIn",
+          "checkOut",
+          "nights",
+          "firstName",
+          "lastName",
+          "email",
+          "totalPrice",
+          "breakfast",
+          "status",
+          "createdAt"
         ]
       },
       "HotelCoordinates": {
@@ -648,7 +938,10 @@
             "example": 16.378
           }
         },
-        "required": ["lat", "lng"]
+        "required": [
+          "lat",
+          "lng"
+        ]
       },
       "HotelInfo": {
         "type": "object",
@@ -679,12 +972,21 @@
             "$ref": "#/components/schemas/HotelCoordinates"
           }
         },
-        "required": ["name", "address", "phone", "email", "directions", "coordinates"]
+        "required": [
+          "name",
+          "address",
+          "phone",
+          "email",
+          "directions",
+          "coordinates"
+        ]
       },
       "BookingConfirmation": {
         "description": "Vollständige Buchungsbestätigung inkl. Hotelinformationen",
         "allOf": [
-          { "$ref": "#/components/schemas/BookingResponse" },
+          {
+            "$ref": "#/components/schemas/BookingResponse"
+          },
           {
             "type": "object",
             "properties": {
@@ -692,7 +994,9 @@
                 "$ref": "#/components/schemas/HotelInfo"
               }
             },
-            "required": ["hotel"]
+            "required": [
+              "hotel"
+            ]
           }
         ]
       },
@@ -703,6 +1007,7 @@
           "timestamp": {
             "type": "string",
             "format": "date-time",
+            "description": "Fehlerzeitpunkt in UTC",
             "example": "2026-05-04T14:30:00Z"
           },
           "status": {
@@ -722,7 +1027,13 @@
             "example": "/api/v1/rooms/1/availability"
           }
         },
-        "required": ["timestamp", "status", "error", "message", "path"]
+        "required": [
+          "timestamp",
+          "status",
+          "error",
+          "message",
+          "path"
+        ]
       },
       "FieldError": {
         "type": "object",
@@ -736,12 +1047,17 @@
             "example": "must be a valid email address"
           }
         },
-        "required": ["field", "message"]
+        "required": [
+          "field",
+          "message"
+        ]
       },
       "ValidationError": {
         "description": "Validierungsfehler mit Felddetails",
         "allOf": [
-          { "$ref": "#/components/schemas/ApiError" },
+          {
+            "$ref": "#/components/schemas/ApiError"
+          },
           {
             "type": "object",
             "properties": {
