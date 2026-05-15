@@ -1,0 +1,398 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #F7F5F0; --surface: #FFFFFF;
+    --border: rgba(0,0,0,0.10); --border-strong: rgba(0,0,0,0.18);
+    --text: #1A1916; --text-muted: #7A7873; --text-hint: #B0ADA8;
+    --accent: #1A1916; --accent-fg: #FFFFFF;
+    --success-bg: #EAF3DE; --success: #3B6D11;
+    --error-bg: #FCEBEB; --error: #A32D2D;
+    --pill-bg: #EFEDE8; --readonly-bg: #F2F0EB;
+    --font-sans: 'DM Sans', sans-serif;
+    --font-serif: 'DM Serif Display', serif;
+    --r: 12px; --r-sm: 8px;
+  }
+  body { font-family: var(--font-sans); background: var(--bg); display: flex; justify-content: center; padding: 16px 0 8px; }
+  .outer { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .step-dots { display: flex; gap: 8px; }
+  .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border-strong); transition: background .25s, width .25s; }
+  .dot.active { width: 20px; border-radius: 3px; background: var(--accent); }
+  .phone { width: 320px; border-radius: 36px; border: 1.5px solid var(--border-strong); background: var(--surface); overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.10); }
+  .status-bar { height: 36px; background: var(--readonly-bg); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; font-size: 11px; color: var(--text-muted); border-bottom: 0.5px solid var(--border); }
+  .screen-wrap { position: relative; height: 620px; overflow: hidden; }
+  .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow-y: auto; scrollbar-width: none; transform: translateX(100%); transition: transform .32s cubic-bezier(.4,0,.2,1); background: var(--surface); }
+  .screen::-webkit-scrollbar { display: none; }
+  .screen.active { transform: translateX(0); }
+  .screen.exit-left { transform: translateX(-28%); }
+  .topbar { padding: 0 16px; height: 52px; display: flex; align-items: center; justify-content: space-between; border-bottom: 0.5px solid var(--border); position: sticky; top: 0; background: var(--surface); z-index: 10; }
+  .topbar-title { font-size: 15px; font-weight: 500; color: var(--text); }
+  .topbar-sub { font-size: 11px; color: var(--text-hint); margin-top: 1px; }
+  .nav-bar { position: sticky; bottom: 0; background: var(--surface); border-top: 0.5px solid var(--border); display: flex; align-items: center; padding: 10px 14px; gap: 8px; z-index: 10; }
+  .btn-back-nav { flex: 1; padding: 11px; border-radius: var(--r-sm); border: 0.5px solid var(--border-strong); background: var(--surface); color: var(--text-muted); font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-sans); transition: background .15s; }
+  .btn-back-nav:hover { background: var(--readonly-bg); }
+  .btn-next-nav { flex: 2; padding: 11px; border-radius: var(--r-sm); border: none; background: var(--accent); color: var(--accent-fg); font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-sans); transition: opacity .15s; }
+  .btn-next-nav:hover { opacity: 0.85; }
+  .date-row { display: flex; gap: 8px; padding: 10px 14px; border-bottom: 0.5px solid var(--border); }
+  .date-box { flex: 1; border: 0.5px solid var(--border-strong); border-radius: var(--r-sm); padding: 7px 10px; }
+  .date-label { font-size: 10px; color: var(--text-hint); }
+  .date-val { font-size: 13px; font-weight: 500; color: var(--text); margin-top: 1px; }
+  .room-list { padding-bottom: 4px; }
+  .room-card { margin: 10px 14px 0; border: 0.5px solid var(--border); border-radius: var(--r); overflow: hidden; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
+  .room-card:hover { border-color: var(--border-strong); box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .room-img { width: 100%; height: 76px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--text-hint); font-style: italic; border-bottom: 0.5px solid var(--border); }
+  .room-body { padding: 9px 12px 11px; }
+  .room-name { font-size: 13px; font-weight: 500; color: var(--text); }
+  .pills { display: flex; gap: 4px; margin-top: 5px; flex-wrap: wrap; }
+  .pill { font-size: 10px; padding: 2px 7px; border-radius: 20px; background: var(--pill-bg); color: var(--text-muted); }
+  .room-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+  .room-price { font-size: 13px; font-weight: 500; color: var(--text); }
+  .price-sub { font-size: 10px; font-weight: 400; color: var(--text-hint); }
+  .badge { font-size: 10px; padding: 3px 8px; border-radius: 20px; }
+  .badge-avail { background: var(--success-bg); color: var(--success); }
+  .page-row { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 12px 14px 4px; }
+  .page-btn { font-size: 12px; padding: 5px 12px; border-radius: var(--r-sm); border: 0.5px solid var(--border-strong); background: var(--surface); color: var(--text-muted); cursor: pointer; font-family: var(--font-sans); transition: background .15s; }
+  .page-btn:hover:not(:disabled) { background: var(--readonly-bg); }
+  .page-btn:disabled { opacity: 0.3; cursor: default; }
+  .page-btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+  .page-info { font-size: 12px; color: var(--text-hint); }
+  .api-note { text-align: center; font-size: 10px; color: var(--text-hint); padding: 4px 14px 8px; font-family: monospace; }
+  .detail-img { width: 100%; height: 150px; display: flex; align-items: center; justify-content: center; font-size: 11px; color: var(--text-hint); font-style: italic; }
+  .detail-body { padding: 14px; }
+  .detail-name { font-size: 18px; font-weight: 400; color: var(--text); font-family: var(--font-serif); margin-top: 8px; }
+  .detail-desc { font-size: 12px; color: var(--text-muted); margin-top: 6px; line-height: 1.6; }
+  .price-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 14px; padding-top: 14px; border-top: 0.5px solid var(--border); }
+  .detail-price { font-size: 20px; font-weight: 500; color: var(--text); }
+  .detail-price-sub { font-size: 11px; color: var(--text-hint); }
+  .detail-nights { font-size: 11px; color: var(--text-hint); margin-top: 2px; }
+  .total-label { font-size: 11px; color: var(--text-hint); text-align: right; }
+  .total-val { font-size: 16px; font-weight: 500; color: var(--text); text-align: right; }
+  .readonly-bar { margin: 10px 14px 0; background: var(--readonly-bg); border: 0.5px solid var(--border); border-radius: var(--r-sm); padding: 9px 12px; display: flex; }
+  .ro-col { flex: 1; }
+  .ro-col + .ro-col { border-left: 0.5px solid var(--border); padding-left: 10px; }
+  .ro-label { font-size: 10px; color: var(--text-hint); }
+  .ro-val { font-size: 12px; font-weight: 500; color: var(--text); margin-top: 2px; }
+  .ro-note { font-size: 10px; color: var(--text-hint); text-align: center; margin: 3px 0 0; }
+  .form-body { padding: 10px 14px 0; }
+  .form-row { display: flex; gap: 8px; }
+  .form-group { flex: 1; margin-bottom: 9px; }
+  .form-label { font-size: 11px; color: var(--text-hint); margin-bottom: 3px; display: block; }
+  .form-input { width: 100%; padding: 8px 10px; font-size: 13px; border: 0.5px solid var(--border-strong); border-radius: var(--r-sm); background: var(--surface); color: var(--text); font-family: var(--font-sans); outline: none; transition: border-color .15s; }
+  .form-input:focus { border-color: var(--text); }
+  .form-input.error { border-color: #E24B4A; background: #fff9f9; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-top: 0.5px solid var(--border); border-bottom: 0.5px solid var(--border); margin-bottom: 10px; }
+  .toggle-label { font-size: 13px; font-weight: 500; color: var(--text); }
+  .toggle-sub { font-size: 11px; color: var(--text-hint); margin-top: 1px; }
+  .toggle-track { width: 36px; height: 20px; border-radius: 10px; background: var(--border-strong); position: relative; cursor: pointer; transition: background .2s; flex-shrink: 0; }
+  .toggle-track.on { background: var(--accent); }
+  .toggle-thumb { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: transform .2s; }
+  .toggle-track.on .toggle-thumb { transform: translateX(16px); }
+  .error-box { background: var(--error-bg); border: 0.5px solid #F09595; border-radius: var(--r-sm); padding: 8px 12px; margin-bottom: 10px; font-size: 11px; color: var(--error); display: none; }
+  .error-box.show { display: block; }
+  .review-section { padding: 14px 14px 0; }
+  .review-title { font-size: 11px; font-weight: 500; color: var(--text-hint); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+  .review-card { border: 0.5px solid var(--border); border-radius: var(--r); overflow: hidden; margin-bottom: 12px; }
+  .review-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; border-bottom: 0.5px solid var(--border); font-size: 12px; }
+  .review-row:last-child { border-bottom: none; }
+  .review-key { color: var(--text-muted); }
+  .review-val { color: var(--text); font-weight: 500; }
+  .edit-btn { font-size: 11px; color: var(--text-hint); background: none; border: 0.5px solid var(--border-strong); cursor: pointer; font-family: var(--font-sans); padding: 3px 8px; border-radius: 6px; }
+  .edit-btn:hover { background: var(--pill-bg); }
+  .price-summary { border: 0.5px solid var(--border); border-radius: var(--r-sm); overflow: hidden; margin-bottom: 10px; }
+  .ps-row { display: flex; justify-content: space-between; padding: 8px 12px; font-size: 12px; color: var(--text-muted); border-bottom: 0.5px solid var(--border); }
+  .ps-total { display: flex; justify-content: space-between; padding: 9px 12px; font-size: 13px; font-weight: 500; color: var(--text); }
+  .confirm-icon { width: 52px; height: 52px; border-radius: 50%; background: var(--success-bg); margin: 28px auto 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: var(--success); }
+  .confirm-title { text-align: center; font-size: 16px; font-weight: 400; color: var(--text); font-family: var(--font-serif); }
+  .confirm-uuid { text-align: center; font-size: 10px; color: var(--text-hint); margin-top: 4px; font-family: monospace; }
+  .confirm-card { margin: 14px 14px 0; border: 0.5px solid var(--border); border-radius: var(--r); overflow: hidden; }
+  .cr { display: flex; justify-content: space-between; padding: 9px 14px; font-size: 12px; border-bottom: 0.5px solid var(--border); }
+  .cr:last-child { border-bottom: none; }
+  .ck { color: var(--text-hint); }
+  .cv { color: var(--text); font-weight: 500; }
+  .cv.ok { color: var(--success); }
+  .hotel-info { margin: 10px 14px 0; border: 0.5px solid var(--border); border-radius: var(--r); padding: 12px 14px; font-size: 12px; color: var(--text-muted); line-height: 1.8; }
+  .hotel-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .confirm-actions { padding: 12px 14px 20px; display: flex; flex-direction: column; gap: 8px; }
+  .btn-outline { width: 100%; padding: 11px; border-radius: var(--r-sm); border: 0.5px solid var(--border-strong); background: var(--surface); color: var(--text-muted); font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-sans); transition: background .15s; }
+  .btn-outline:hover { background: var(--readonly-bg); }
+  .btn-solid { width: 100%; padding: 11px; border-radius: var(--r-sm); border: none; background: var(--accent); color: var(--accent-fg); font-size: 13px; font-weight: 500; cursor: pointer; font-family: var(--font-sans); transition: opacity .15s; }
+  .btn-solid:hover { opacity: 0.85; }
+  .screen-label { font-size: 11px; color: var(--text-hint); text-align: center; letter-spacing: 0.03em; }
+</style>
+
+<div class="outer">
+  <div class="step-dots">
+    <div class="dot active" id="d0"></div>
+    <div class="dot" id="d1"></div>
+    <div class="dot" id="d2"></div>
+    <div class="dot" id="d3"></div>
+    <div class="dot" id="d4"></div>
+  </div>
+
+  <div class="phone">
+    <div class="status-bar"><span>9:41</span><span>●●●</span></div>
+    <div class="screen-wrap">
+
+      <!-- S0: Zimmerübersicht -->
+      <div class="screen active" id="s0">
+        <div class="topbar">
+          <div><div class="topbar-title">Hotel Technikum</div><div class="topbar-sub">Wien · 12 Zimmer</div></div>
+        </div>
+        <div class="date-row">
+          <div class="date-box"><div class="date-label">Check-in</div><div class="date-val">01.07.2026</div></div>
+          <div class="date-box"><div class="date-label">Check-out</div><div class="date-val">05.07.2026</div></div>
+        </div>
+        <div class="room-list" id="roomList"></div>
+        <div class="page-row">
+          <button class="page-btn" id="prevBtn" disabled onclick="changePage(-1)">← Zurück</button>
+          <span class="page-info" id="pageInfo">Seite 1 von 3</span>
+          <button class="page-btn primary" id="nextBtn" onclick="changePage(1)">Weiter →</button>
+        </div>
+        <div class="api-note">GET /rooms?page=<span id="pageNum">0</span>&size=5&checkIn=…&checkOut=…</div>
+      </div>
+
+      <!-- S1: Zimmerdetail -->
+      <div class="screen" id="s1">
+        <div class="detail-img" id="detailImg" style="background:linear-gradient(135deg,#E0DCD4,#CCC8BF)">[ Zimmerbild groß ]</div>
+        <div class="detail-body">
+          <div class="detail-name" id="detailName">–</div>
+          <div class="pills" id="detailPills" style="margin-top:8px"></div>
+          <div class="detail-desc" id="detailDesc"></div>
+          <div style="margin-top:10px"><span class="badge badge-avail">Verfügbar</span></div>
+          <div class="price-row">
+            <div>
+              <div class="detail-price" id="detailPrice">–</div>
+              <div class="detail-nights">4 Nächte · 01.07 – 05.07</div>
+            </div>
+            <div>
+              <div class="total-label">Gesamt</div>
+              <div class="total-val" id="detailTotal">–</div>
+            </div>
+          </div>
+        </div>
+        <div class="api-note">GET /rooms/{id}/availability?checkIn=…&checkOut=…</div>
+        <div class="nav-bar">
+          <button class="btn-back-nav" onclick="go(0)">← Zurück</button>
+          <button class="btn-next-nav" onclick="go(2)">Jetzt buchen →</button>
+        </div>
+      </div>
+
+      <!-- S2: Buchungsformular -->
+      <div class="screen" id="s2">
+        <div class="topbar"><div class="topbar-title">Deine Daten</div></div>
+        <div class="readonly-bar">
+          <div class="ro-col"><div class="ro-label">Check-in</div><div class="ro-val">01.07.2026</div></div>
+          <div class="ro-col"><div class="ro-label">Check-out</div><div class="ro-val">05.07.2026</div></div>
+          <div class="ro-col"><div class="ro-label">Nächte</div><div class="ro-val">4</div></div>
+        </div>
+        <div class="ro-note">Nicht editierbar</div>
+        <div class="form-body">
+          <div class="form-row">
+            <div class="form-group"><label class="form-label">Vorname</label><input class="form-input" id="fn" placeholder="Max"></div>
+            <div class="form-group"><label class="form-label">Nachname</label><input class="form-input" id="ln" placeholder="Mustermann"></div>
+          </div>
+          <div class="form-group"><label class="form-label">E-Mail</label><input class="form-input" id="em" type="email" placeholder="max@example.com"></div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Frühstück</div><div class="toggle-sub">Aufpreis vom Hotel berechnet</div></div>
+            <div class="toggle-track on" id="bfToggle" onclick="this.classList.toggle('on')"><div class="toggle-thumb"></div></div>
+          </div>
+          <div class="error-box" id="errBox"></div>
+        </div>
+        <div class="api-note">Daten lokal bis POST /bookings</div>
+        <div class="nav-bar">
+          <button class="btn-back-nav" onclick="go(1)">← Zurück</button>
+          <button class="btn-next-nav" onclick="validateAndReview()">Überprüfen →</button>
+        </div>
+      </div>
+
+      <!-- S3: Review -->
+      <div class="screen" id="s3">
+        <div class="topbar"><div class="topbar-title">Überprüfen</div></div>
+        <div class="review-section">
+          <div class="review-title">Buchungsdetails</div>
+          <div class="review-card">
+            <div class="review-row"><span class="review-key">Zimmer</span><span class="review-val" id="rv-room">–</span></div>
+            <div class="review-row"><span class="review-key">Check-in</span><span class="review-val">01.07.2026</span></div>
+            <div class="review-row"><span class="review-key">Check-out</span><span class="review-val">05.07.2026</span></div>
+            <div class="review-row"><span class="review-key">Nächte</span><span class="review-val">4</span></div>
+          </div>
+          <div class="review-title">Persönliche Daten <button class="edit-btn" onclick="go(2)">✎ Bearbeiten</button></div>
+          <div class="review-card">
+            <div class="review-row"><span class="review-key">Name</span><span class="review-val" id="rv-name">–</span></div>
+            <div class="review-row"><span class="review-key">E-Mail</span><span class="review-val" id="rv-email">–</span></div>
+            <div class="review-row"><span class="review-key">Frühstück</span><span class="review-val" id="rv-bf">–</span></div>
+          </div>
+          <div class="review-title">Preis</div>
+          <div class="price-summary">
+            <div class="ps-row"><span id="rv-room2">–</span><span id="rv-base">–</span></div>
+            <div class="ps-row" id="rv-bf-row"><span>Frühstück</span><span>+ Aufpreis</span></div>
+            <div class="ps-total"><span>Gesamt</span><span id="rv-total">–</span></div>
+          </div>
+        </div>
+        <div class="api-note">POST /bookings</div>
+        <div class="nav-bar">
+          <button class="btn-back-nav" onclick="go(2)">← Bearbeiten</button>
+          <button class="btn-next-nav" onclick="go(4)">Jetzt buchen →</button>
+        </div>
+      </div>
+
+      <!-- S4: Bestätigung -->
+      <div class="screen" id="s4">
+        <div class="confirm-icon">✓</div>
+        <div class="confirm-title">Buchung bestätigt</div>
+        <div class="confirm-uuid">a3f1c2d4-e5b6-7890-abcd-ef1234…</div>
+        <div class="confirm-card">
+          <div class="cr"><span class="ck">Zimmer</span><span class="cv" id="cf-room">–</span></div>
+          <div class="cr"><span class="ck">Check-in</span><span class="cv">01.07.2026</span></div>
+          <div class="cr"><span class="ck">Check-out</span><span class="cv">05.07.2026</span></div>
+          <div class="cr"><span class="ck">Frühstück</span><span class="cv" id="cf-bf">–</span></div>
+          <div class="cr"><span class="ck">Gesamt</span><span class="cv" id="cf-total">–</span></div>
+          <div class="cr"><span class="ck">Status</span><span class="cv ok">CONFIRMED</span></div>
+        </div>
+        <div class="hotel-info">
+          <div class="hotel-name">Boutique Hotel Technikum</div>
+          <div>Höchstädtplatz 6, 1200 Wien</div>
+          <div>U6 Dresdner Straße · 2 min Fußweg</div>
+          <div>+43 1 XXXXXXX · info@hotel-technikum.at</div>
+        </div>
+        <div class="confirm-actions">
+          <button class="btn-outline" onclick="go(0)">← Neue Suche starten</button>
+        </div>
+        <div class="api-note">GET /bookings/{id}</div>
+      </div>
+
+    </div>
+  </div>
+  <div class="screen-label" id="screenLabel">① Zimmerübersicht</div>
+</div>
+
+<script>
+const labels = ['① Zimmerübersicht','② Zimmerdetail','③ Deine Daten','④ Überprüfen','⑤ Bestätigung'];
+let current = 0;
+let selectedRoom = null;
+let page = 0;
+const totalPages = 3;
+
+const allRooms = [
+  // Page 0
+  [
+    { name:'Deluxe Suite', price:'€ 149,00', total:'€ 596,00', pills:['WiFi','Minibar','Balkon'], desc:'Geräumige Suite mit Balkon und Bergblick. Ideal für einen erholsamen Aufenthalt in Wien.', bg:'linear-gradient(135deg,#E0DCD4,#CCC8BF)' },
+    { name:'Dachterrassenzimmer', price:'€ 189,00', total:'€ 756,00', pills:['WiFi','Minibar','Balkon','Klimaanlage'], desc:'Exklusives Zimmer mit privatem Zugang zur Dachterrasse und Panoramablick über Wien.', bg:'linear-gradient(135deg,#D4CCBC,#C4BCA8)' },
+    { name:'Junior Suite', price:'€ 129,00', total:'€ 516,00', pills:['WiFi','Minibar','Klimaanlage'], desc:'Großzügige Suite mit getrenntem Wohnbereich und modernem Bad.', bg:'linear-gradient(135deg,#DCDAD4,#CCCAC4)' },
+  ],
+  // Page 1
+  [
+    { name:'Einzelzimmer Komfort', price:'€ 79,00', total:'€ 316,00', pills:['WiFi','Safe','Parkplatz'], desc:'Ruhiges Zimmer mit Stadtblick, ideal für Geschäftsreisende.', bg:'linear-gradient(135deg,#E4E0D8,#D4D0C8)' },
+    { name:'Superior Doppelzimmer', price:'€ 109,00', total:'€ 436,00', pills:['WiFi','Minibar'], desc:'Komfortables Zimmer mit großem Doppelbett und edler Einrichtung.', bg:'linear-gradient(135deg,#D8D4CC,#C8C4BC)' },
+  ],
+  // Page 2
+  [
+    { name:'Penthouse Suite', price:'€ 249,00', total:'€ 996,00', pills:['WiFi','Minibar','Balkon','Klimaanlage','Safe'], desc:'Unser exklusivstes Zimmer mit privater Terrasse und Rundum-Stadtblick.', bg:'linear-gradient(135deg,#D0CCBC,#C0BCAC)' },
+    { name:'Familienzimmer', price:'€ 169,00', total:'€ 676,00', pills:['WiFi','Klimaanlage','Parkplatz'], desc:'Geräumiges Zimmer für Familien mit zwei getrennten Schlafbereichen.', bg:'linear-gradient(135deg,#E0DCCC,#D0CCBC)' },
+    { name:'Studio Apartment', price:'€ 139,00', total:'€ 556,00', pills:['WiFi','Safe','Klimaanlage'], desc:'Modernes Studio mit Kitchenette, ideal für längere Aufenthalte.', bg:'linear-gradient(135deg,#D8D4C8,#C8C4B8)' },
+  ],
+];
+
+function renderRooms() {
+  const list = document.getElementById('roomList');
+  list.innerHTML = '';
+  allRooms[page].forEach((r, i) => {
+    const card = document.createElement('div');
+    card.className = 'room-card';
+    card.innerHTML = `
+      <div class="room-img" style="background:${r.bg}">[ Zimmerbild ]</div>
+      <div class="room-body">
+        <div class="room-name">${r.name}</div>
+        <div class="pills">${r.pills.map(p=>`<span class="pill">${p}</span>`).join('')}</div>
+        <div class="room-footer">
+          <div class="room-price">${r.price} <span class="price-sub">/ Nacht</span></div>
+          <span class="badge badge-avail">Verfügbar · ${r.total}</span>
+        </div>
+      </div>`;
+    card.onclick = () => openDetail(page, i);
+    list.appendChild(card);
+  });
+}
+
+function openDetail(p, i) {
+  selectedRoom = allRooms[p][i];
+  document.getElementById('detailName').textContent = selectedRoom.name;
+  document.getElementById('detailImg').style.background = selectedRoom.bg;
+  document.getElementById('detailDesc').textContent = selectedRoom.desc;
+  document.getElementById('detailPrice').innerHTML = selectedRoom.price + ' <span class="detail-price-sub">/ Nacht</span>';
+  document.getElementById('detailTotal').textContent = selectedRoom.total;
+  document.getElementById('detailPills').innerHTML = selectedRoom.pills.map(p=>`<span class="pill">${p}</span>`).join('');
+  go(1);
+}
+
+function changePage(dir) {
+  page = Math.max(0, Math.min(totalPages - 1, page + dir));
+  document.getElementById('pageInfo').textContent = 'Seite ' + (page+1) + ' von ' + totalPages;
+  document.getElementById('pageNum').textContent = page;
+  document.getElementById('prevBtn').disabled = page === 0;
+  const nb = document.getElementById('nextBtn');
+  nb.disabled = page === totalPages - 1;
+  nb.classList.toggle('primary', page < totalPages - 1);
+  renderRooms();
+}
+
+function go(next) {
+  const cur = document.getElementById('s' + current);
+  const nxt = document.getElementById('s' + next);
+  if (next > current) {
+    cur.classList.add('exit-left');
+    nxt.style.transform = 'translateX(100%)';
+    nxt.classList.add('active');
+    requestAnimationFrame(() => {
+      nxt.style.transform = '';
+      setTimeout(() => { cur.classList.remove('active','exit-left'); }, 320);
+    });
+  } else {
+    nxt.style.transform = 'translateX(-28%)';
+    nxt.classList.add('active');
+    requestAnimationFrame(() => {
+      nxt.style.transform = '';
+      cur.style.transform = 'translateX(100%)';
+      setTimeout(() => { cur.classList.remove('active'); cur.style.transform = ''; }, 320);
+    });
+  }
+  for (let i = 0; i <= 4; i++) document.getElementById('d'+i).classList.toggle('active', i === next);
+  document.getElementById('screenLabel').textContent = labels[next];
+  document.getElementById('s'+next).scrollTop = 0;
+  current = next;
+}
+
+function validateAndReview() {
+  const fn = document.getElementById('fn').value.trim();
+  const ln = document.getElementById('ln').value.trim();
+  const em = document.getElementById('em').value.trim();
+  const err = document.getElementById('errBox');
+  let errors = [];
+  document.getElementById('fn').classList.toggle('error', !fn);
+  document.getElementById('ln').classList.toggle('error', !ln);
+  const emailOk = em && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em);
+  document.getElementById('em').classList.toggle('error', !emailOk);
+  if (!fn) errors.push('Vorname');
+  if (!ln) errors.push('Nachname');
+  if (!emailOk) errors.push('E-Mail');
+  if (errors.length) { err.textContent = 'Pflichtfelder: ' + errors.join(', '); err.classList.add('show'); return; }
+  err.classList.remove('show');
+  const bf = document.getElementById('bfToggle').classList.contains('on');
+  const r = selectedRoom;
+  document.getElementById('rv-room').textContent = r.name;
+  document.getElementById('rv-room2').textContent = r.name;
+  document.getElementById('rv-name').textContent = fn + ' ' + ln;
+  document.getElementById('rv-email').textContent = em;
+  document.getElementById('rv-bf').textContent = bf ? 'Ja' : 'Nein';
+  document.getElementById('rv-base').textContent = r.total;
+  document.getElementById('rv-bf-row').style.display = bf ? '' : 'none';
+  document.getElementById('rv-total').textContent = r.total;
+  document.getElementById('cf-room').textContent = r.name;
+  document.getElementById('cf-bf').textContent = bf ? 'Ja' : 'Nein';
+  document.getElementById('cf-total').textContent = r.total;
+  go(3);
+}
+
+renderRooms();
+</script>
