@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS room_extra (
 -- check_in == check_out: erlaubt (= 1 Nacht), CHECK verhindert check_out < check_in
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS booking (
-    id          TEXT           PRIMARY KEY,                          -- UUID
+    id          VARCHAR(36)    PRIMARY KEY,                         -- UUID
     room_id     INTEGER        NOT NULL REFERENCES room(id),
     first_name  VARCHAR(100)   NOT NULL,
     last_name   VARCHAR(100)   NOT NULL,

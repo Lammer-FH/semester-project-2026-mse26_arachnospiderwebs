@@ -500,7 +500,7 @@
           }
         }
       },
-      "delete": {
+      "patch": {
         "tags": [
           "Bookings"
         ],
@@ -519,6 +519,28 @@
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": {
+                    "type": "string",
+                    "example": "CANCELLED"
+                  }
+                },
+                "required": [
+                  "status"
+                ]
+              },
+              "example": {
+                "status": "CANCELLED"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Buchung erfolgreich storniert",
