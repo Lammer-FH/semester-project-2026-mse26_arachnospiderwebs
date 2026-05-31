@@ -1,3 +1,7 @@
 *.db
 *.db-shm
 *.db-wal
+
+# JetBrains IDEs
+.idea/
+*.iml
