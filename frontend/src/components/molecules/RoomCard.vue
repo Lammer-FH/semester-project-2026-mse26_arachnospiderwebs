@@ -2,9 +2,13 @@
   <IonCard class="room-card" button @click="$emit('select', room.id)">
     <div class="room-image-wrapper">
       <img :src="room.imageUrl" :alt="room.title" class="room-image" loading="lazy" />
-      <div v-if="room.availability" class="availability-badge" :class="room.availability.available ? 'available' : 'unavailable'">
+      <IonBadge
+        v-if="room.availability"
+        :color="room.availability.available ? 'success' : 'danger'"
+        class="availability-badge"
+      >
         {{ room.availability.available ? 'Verfügbar' : 'Belegt' }}
-      </div>
+      </IonBadge>
     </div>
     <IonCardHeader>
       <IonCardTitle>{{ room.title }}</IonCardTitle>
@@ -25,7 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent } from '@ionic/vue';
+import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonBadge } from '@ionic/vue';
 import ExtraChip from './ExtraChip.vue';
 import type { Room } from '@/types/room';
 
@@ -58,18 +62,6 @@ function formatPrice(price: number) {
   position: absolute;
   top: 12px;
   right: 12px;
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.78rem;
-  font-weight: 700;
-}
-.available {
-  background: var(--ion-color-success);
-  color: #fff;
-}
-.unavailable {
-  background: var(--ion-color-danger);
-  color: #fff;
 }
 .room-description {
   font-size: 0.9rem;

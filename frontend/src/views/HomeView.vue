@@ -17,13 +17,19 @@
       <section class="section">
         <div class="container">
           <h2 class="section-title">Warum Boutique Hotel Technikum?</h2>
-          <div class="features-grid">
-            <div class="feature-card" v-for="f in features" :key="f.title">
-              <ion-icon :name="f.icon" class="feature-icon" />
-              <h3>{{ f.title }}</h3>
-              <p>{{ f.text }}</p>
-            </div>
-          </div>
+          <IonGrid class="ion-no-padding">
+            <IonRow>
+              <IonCol size="12" size-sm="6" size-md="3" v-for="f in features" :key="f.title">
+                <IonCard class="feature-card">
+                  <IonCardContent class="ion-text-center">
+                    <IonIcon :icon="f.icon" class="feature-icon" />
+                    <h3>{{ f.title }}</h3>
+                    <p>{{ f.text }}</p>
+                  </IonCardContent>
+                </IonCard>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
         </div>
       </section>
 
@@ -38,29 +44,37 @@
         </div>
       </section>
 
-      <!-- Footer -->
-      <footer class="site-footer">
-        <div class="container">
-          <p>© 2026 Boutique Hotel Technikum &nbsp;|&nbsp;
+    </IonContent>
+    <IonFooter class="ion-no-border">
+      <IonToolbar color="primary">
+        <div class="container ion-text-center">
+          <p class="footer-text">© 2026 Boutique Hotel Technikum &nbsp;|&nbsp;
             <router-link to="/imprint" class="footer-link">Impressum</router-link>
             &nbsp;|&nbsp;
             <router-link to="/about" class="footer-link">Über uns</router-link>
           </p>
         </div>
-      </footer>
-    </IonContent>
+      </IonToolbar>
+    </IonFooter>
   </IonPage>
 </template>
 
 <script setup lang="ts">
-import { IonPage, IonContent, IonButton } from '@ionic/vue';
+import { IonPage, IonContent, IonButton, IonGrid, IonRow, IonCol, IonCard, IonCardContent, IonIcon, IonFooter, IonToolbar } from '@ionic/vue';
+import { locationOutline, starOutline, restaurantOutline, wifiOutline } from 'ionicons/icons';
 import AppNavbar from '@/components/organisms/AppNavbar.vue';
 
-const features = [
-  { icon: 'location', title: 'Zentrale Lage', text: 'Direkt im 1. Bezirk, fußläufig zu allen Sehenswürdigkeiten.' },
-  { icon: 'star', title: 'Boutique-Qualität', text: 'Individuell eingerichtete Zimmer mit persönlichem Service.' },
-  { icon: 'restaurant', title: 'Frühstück', text: 'Täglich frisches Frühstücksbuffet mit regionalen Produkten.' },
-  { icon: 'wifi', title: 'Free WiFi', text: 'Kostenloses Highspeed-WLAN in allen Zimmern und Bereichen.' },
+interface Feature {
+  icon: string;
+  title: string;
+  text: string;
+}
+
+const features: Feature[] = [
+  { icon: locationOutline, title: 'Zentrale Lage', text: 'Direkt im 1. Bezirk, fußläufig zu allen Sehenswürdigkeiten.' },
+  { icon: starOutline, title: 'Boutique-Qualität', text: 'Individuell eingerichtete Zimmer mit persönlichem Service.' },
+  { icon: restaurantOutline, title: 'Frühstück', text: 'Täglich frisches Frühstücksbuffet mit regionalen Produkten.' },
+  { icon: wifiOutline, title: 'Free WiFi', text: 'Kostenloses Highspeed-WLAN in allen Zimmern und Bereichen.' },
 ];
 </script>
 
@@ -109,37 +123,15 @@ const features = [
   margin-bottom: 32px;
   text-align: center;
 }
-.features-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 24px;
-}
-.feature-card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 24px;
-  text-align: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-}
 .feature-icon {
   font-size: 2.5rem;
   color: var(--ion-color-secondary);
   margin-bottom: 12px;
 }
-.feature-card h3 {
-  color: var(--ion-color-primary);
-  margin-bottom: 8px;
-}
-.feature-card p {
-  font-size: 0.9rem;
-  color: var(--ion-color-medium);
-}
-.site-footer {
-  background: var(--ion-color-primary);
+.footer-text {
   color: #fff;
-  padding: 24px 16px;
-  text-align: center;
   font-size: 0.875rem;
+  margin: 0;
 }
 .footer-link {
   color: var(--ion-color-secondary);

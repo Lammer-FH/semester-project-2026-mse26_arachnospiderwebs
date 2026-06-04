@@ -6,6 +6,7 @@ const routes: RouteRecordRaw[] = [
   { path: '/home', component: () => import('@/views/HomeView.vue') },
   { path: '/rooms', component: () => import('@/views/RoomsView.vue') },
   { path: '/rooms/:id', component: () => import('@/views/RoomDetailView.vue') },
+  { path: '/booking', component: () => import('@/views/BookingView.vue') },
   { path: '/about', component: () => import('@/views/AboutView.vue') },
   { path: '/imprint', component: () => import('@/views/ImprintView.vue') },
 ];

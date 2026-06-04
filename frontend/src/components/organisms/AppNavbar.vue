@@ -28,9 +28,8 @@ withDefaults(defineProps<{ showMenu?: boolean }>(), { showMenu: true });
 
 <style scoped>
 .brand-link {
-  color: #fff;
-  text-decoration: none;
   font-weight: 600;
+  text-decoration: none;
 }
 .nav-links {
   display: none;
