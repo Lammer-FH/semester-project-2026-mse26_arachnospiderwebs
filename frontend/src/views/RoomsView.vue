@@ -6,30 +6,20 @@
         <div class="container">
           <h1 class="page-title">Unsere Zimmer</h1>
 
-          <div class="filter-bar">
-            <DateRangePicker
-              :check-in="checkIn"
-              :check-out="checkOut"
-              @update:check-in="checkIn = $event"
-              @update:check-out="checkOut = $event"
-            />
-            <IonButton
-              color="primary"
-              class="search-btn"
-              @click="search"
-            >
-              <IonIcon slot="start" name="search" />
-              Suchen
-            </IonButton>
-            <IonButton
-              v-if="checkIn || checkOut"
-              fill="clear"
-              color="medium"
-              @click="resetFilter"
-            >
-              Zurücksetzen
-            </IonButton>
-          </div>
+          <IonCard class="filter-bar">
+            <IonCardContent>
+              <div class="filter-bar-content">
+                <DateRangePicker
+                  :check-in="checkIn"
+                  :check-out="checkOut"
+                  :horizontal="isLargeScreen"
+                  @update:check-in="checkIn = $event"
+                  @update:check-out="checkOut = $event"
+                />
+
+              </div>
+            </IonCardContent>
+          </IonCard>
 
           <RoomList
             :rooms="store.rooms"
@@ -50,9 +40,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { IonPage, IonContent, IonButton, IonIcon } from '@ionic/vue';
+import { IonPage, IonContent, IonCard, IonCardContent } from '@ionic/vue';
 import AppNavbar from '@/components/organisms/AppNavbar.vue';
 import RoomList from '@/components/organisms/RoomList.vue';
 import DateRangePicker from '@/components/molecules/DateRangePicker.vue';
@@ -61,13 +51,31 @@ import { useRoomStore } from '@/stores/roomStore';
 const router = useRouter();
 const store = useRoomStore();
 
-const checkIn = ref('');
-const checkOut = ref('');
+const checkIn = ref(store.searchCheckIn);
+const checkOut = ref(store.searchCheckOut);
 const page = ref(0);
+const isLargeScreen = ref(window.innerWidth >= 769);
+
+watch([checkIn, checkOut], () => {
+  search();
+});
+
+let mql: MediaQueryList | undefined;
 
 onMounted(() => {
+  mql = window.matchMedia('(min-width: 769px)');
+  isLargeScreen.value = mql.matches;
+  mql.addEventListener('change', onBreakpointChange);
   loadRooms();
 });
+
+onUnmounted(() => {
+  mql?.removeEventListener('change', onBreakpointChange);
+});
+
+function onBreakpointChange(e: MediaQueryListEvent) {
+  isLargeScreen.value = e.matches;
+}
 
 function loadRooms() {
   store.fetchRooms(page.value, checkIn.value || undefined, checkOut.value || undefined);
@@ -75,13 +83,7 @@ function loadRooms() {
 
 function search() {
   page.value = 0;
-  loadRooms();
-}
-
-function resetFilter() {
-  checkIn.value = '';
-  checkOut.value = '';
-  page.value = 0;
+  store.setSearchDates(checkIn.value, checkOut.value);
   loadRooms();
 }
 
@@ -91,34 +93,22 @@ function goToRoom(id: number) {
 </script>
 
 <style scoped>
-.section {
-  padding: 32px 16px;
-}
 .container {
   max-width: 1100px;
   margin: 0 auto;
 }
-.page-title {
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  color: var(--ion-color-primary);
-  margin-bottom: 24px;
-  text-align: center;
-}
-.filter-bar {
+.filter-bar-content {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
+  flex-direction: column;
   gap: 12px;
-  background: var(--ion-color-light);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 24px;
 }
-.filter-bar > .date-range-picker {
-  flex: 1 1 320px;
-}
-.search-btn {
-  height: 44px;
-  --border-radius: 4px;
+
+@media (min-width: 769px) {
+  .filter-bar-content {
+    flex-direction: row;
+    align-items: flex-end;
+  }
+
+
 }
 </style>

@@ -1,5 +1,5 @@
 import api from './api';
-import type { AvailabilityResponse, RoomPage } from '@/types/room';
+import type { AvailabilityResponse, RoomPage, Room } from '@/types/room';
 
 export const roomApi = {
   getRooms(page: number, size = 5, checkIn?: string, checkOut?: string): Promise<RoomPage> {
@@ -8,7 +8,7 @@ export const roomApi = {
       .then((r) => r.data);
   },
 
-  getRoom(id: number): Promise<import('@/types/room').Room> {
+  getRoom(id: number): Promise<Room> {
     return api.get(`/rooms/${id}`).then((r) => r.data);
   },
 

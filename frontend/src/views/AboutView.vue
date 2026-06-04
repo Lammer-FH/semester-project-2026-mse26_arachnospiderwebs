@@ -27,36 +27,48 @@
               Wir befinden uns zentral im 1. Bezirk Wiens, nur wenige Gehminuten vom Stephansdom und der
               Ringstraße entfernt. Öffentliche Verkehrsmittel (U1, U3) sind fußläufig erreichbar.
             </p>
-            <div class="info-grid">
-              <div class="info-item">
-                <ion-icon name="location" class="info-icon" />
-                <div>
-                  <strong>Adresse</strong>
-                  <p>Höchstädtplatz 6, 1200 Wien</p>
-                </div>
-              </div>
-              <div class="info-item">
-                <ion-icon name="call" class="info-icon" />
-                <div>
-                  <strong>Telefon</strong>
-                  <p>+43 1 333 44 55</p>
-                </div>
-              </div>
-              <div class="info-item">
-                <ion-icon name="mail" class="info-icon" />
-                <div>
-                  <strong>E-Mail</strong>
-                  <p>info@hotel-technikum.at</p>
-                </div>
-              </div>
-              <div class="info-item">
-                <ion-icon name="time" class="info-icon" />
-                <div>
-                  <strong>Check-in / Check-out</strong>
-                  <p>Check-in ab 14:00 Uhr<br>Check-out bis 12:00 Uhr</p>
-                </div>
-              </div>
-            </div>
+            <IonGrid class="ion-no-padding">
+              <IonRow>
+                <IonCol size="12" size-md="6">
+                  <IonItem>
+                    <IonIcon :icon="locationOutline" slot="start" />
+                    <IonLabel>
+                      <h3>Adresse</h3>
+                      <p>Höchstädtplatz 6, 1200 Wien</p>
+                    </IonLabel>
+                  </IonItem>
+                </IonCol>
+                <IonCol size="12" size-md="6">
+                  <IonItem>
+                    <IonIcon :icon="callOutline" slot="start" />
+                    <IonLabel>
+                      <h3>Telefon</h3>
+                      <p>+43 1 333 44 55</p>
+                    </IonLabel>
+                  </IonItem>
+                </IonCol>
+              </IonRow>
+              <IonRow>
+                <IonCol size="12" size-md="6">
+                  <IonItem>
+                    <IonIcon :icon="mailOutline" slot="start" />
+                    <IonLabel>
+                      <h3>E-Mail</h3>
+                      <p>info@hotel-technikum.at</p>
+                    </IonLabel>
+                  </IonItem>
+                </IonCol>
+                <IonCol size="12" size-md="6">
+                  <IonItem>
+                    <IonIcon :icon="timeOutline" slot="start" />
+                    <IonLabel>
+                      <h3>Check-in / Check-out</h3>
+                      <p>Check-in ab 14:00 Uhr<br>Check-out bis 12:00 Uhr</p>
+                    </IonLabel>
+                  </IonItem>
+                </IonCol>
+              </IonRow>
+            </IonGrid>
           </IonCardContent>
         </IonCard>
 
@@ -82,7 +94,8 @@
 </template>
 
 <script setup lang="ts">
-import { IonPage, IonContent, IonCard, IonCardContent, IonButton } from '@ionic/vue';
+import { IonPage, IonContent, IonCard, IonCardContent, IonButton, IonGrid, IonRow, IonCol, IonItem, IonIcon, IonLabel } from '@ionic/vue';
+import { locationOutline, callOutline, mailOutline, timeOutline } from 'ionicons/icons';
 import AppNavbar from '@/components/organisms/AppNavbar.vue';
 </script>
 
@@ -106,21 +119,5 @@ p {
   line-height: 1.7;
   margin-bottom: 12px;
 }
-.info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-top: 16px;
-}
-.info-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-.info-icon {
-  font-size: 1.5rem;
-  color: var(--ion-color-secondary);
-  margin-top: 2px;
-  flex-shrink: 0;
-}
+
 </style>

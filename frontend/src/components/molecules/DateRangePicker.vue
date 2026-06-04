@@ -1,5 +1,5 @@
 <template>
-  <div class="date-range-picker">
+  <div class="date-range-picker" :class="{ horizontal }">
     <IonItem>
       <IonLabel position="stacked">Anreise</IonLabel>
       <IonInput
@@ -18,19 +18,20 @@
         @ion-change="onCheckOutChange"
       />
     </IonItem>
-    <p v-if="validationError" class="error-text ion-padding-horizontal">
+    <IonNote v-if="validationError" color="danger" class="ion-padding-horizontal">
       {{ validationError }}
-    </p>
+    </IonNote>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue';
-import { IonItem, IonLabel, IonInput } from '@ionic/vue';
+import { IonItem, IonLabel, IonInput, IonNote } from '@ionic/vue';
 
 const props = defineProps<{
   checkIn: string;
   checkOut: string;
+  horizontal?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -61,8 +62,13 @@ function onCheckOutChange(e: CustomEvent) {
   flex-direction: column;
   gap: 4px;
 }
-.error-text {
-  color: var(--ion-color-danger);
-  font-size: 0.8rem;
+
+.date-range-picker.horizontal {
+  flex-direction: row;
+  gap: 8px;
+}
+
+.date-range-picker.horizontal IonItem {
+  flex: 1;
 }
 </style>

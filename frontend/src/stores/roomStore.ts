@@ -14,10 +14,20 @@ export const useRoomStore = defineStore('rooms', () => {
   const selectedRoom = ref<Room | null>(null);
   const availability = ref<AvailabilityResponse | null>(null);
 
+  const searchCheckIn = ref('');
+  const searchCheckOut = ref('');
+
   const loading = ref(false);
   const error = ref<string | null>(null);
 
+  function setSearchDates(checkIn: string, checkOut: string) {
+    searchCheckIn.value = checkIn;
+    searchCheckOut.value = checkOut;
+  }
+
   async function fetchRooms(page = 0, checkIn?: string, checkOut?: string) {
+    if (checkIn !== undefined) searchCheckIn.value = checkIn;
+    if (checkOut !== undefined) searchCheckOut.value = checkOut;
     loading.value = true;
     error.value = null;
     try {
@@ -79,8 +89,11 @@ export const useRoomStore = defineStore('rooms', () => {
     hasPreviousPage,
     selectedRoom,
     availability,
+    searchCheckIn,
+    searchCheckOut,
     loading,
     error,
+    setSearchDates,
     fetchRooms,
     fetchRoom,
     checkAvailability,

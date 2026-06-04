@@ -1,0 +1,402 @@
+/* ==========================================================
+   UTILITY CLASSES — uses design tokens from variables.css
+   ========================================================== */
+
+/* ==========================================================
+   SPACING — Margin
+   ========================================================== */
+.mt-0 { margin-top: 0; }
+.mt-xs { margin-top: var(--spacing-xs); }
+.mt-sm { margin-top: var(--spacing-sm); }
+.mt-md { margin-top: var(--spacing-md); }
+.mt-lg { margin-top: var(--spacing-lg); }
+.mt-xl { margin-top: var(--spacing-xl); }
+.mt-xxl { margin-top: var(--spacing-xxl); }
+
+.mb-0 { margin-bottom: 0; }
+.mb-xs { margin-bottom: var(--spacing-xs); }
+.mb-sm { margin-bottom: var(--spacing-sm); }
+.mb-md { margin-bottom: var(--spacing-md); }
+.mb-lg { margin-bottom: var(--spacing-lg); }
+.mb-xl { margin-bottom: var(--spacing-xl); }
+.mb-xxl { margin-bottom: var(--spacing-xxl); }
+
+.ml-0 { margin-left: 0; }
+.ml-xs { margin-left: var(--spacing-xs); }
+.ml-sm { margin-left: var(--spacing-sm); }
+.ml-md { margin-left: var(--spacing-md); }
+.ml-lg { margin-left: var(--spacing-lg); }
+.ml-xl { margin-left: var(--spacing-xl); }
+
+.mr-0 { margin-right: 0; }
+.mr-xs { margin-right: var(--spacing-xs); }
+.mr-sm { margin-right: var(--spacing-sm); }
+.mr-md { margin-right: var(--spacing-md); }
+.mr-lg { margin-right: var(--spacing-lg); }
+.mr-xl { margin-right: var(--spacing-xl); }
+
+/* ==========================================================
+   SPACING — Padding
+   ========================================================== */
+.p-0 { padding: 0; }
+.p-xs { padding: var(--spacing-xs); }
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-lg { padding: var(--spacing-lg); }
+.p-xl { padding: var(--spacing-xl); }
+.p-xxl { padding: var(--spacing-xxl); }
+
+.px-0 { padding-left: 0; padding-right: 0; }
+.px-xs { padding-left: var(--spacing-xs); padding-right: var(--spacing-xs); }
+.px-sm { padding-left: var(--spacing-sm); padding-right: var(--spacing-sm); }
+.px-md { padding-left: var(--spacing-md); padding-right: var(--spacing-md); }
+.px-lg { padding-left: var(--spacing-lg); padding-right: var(--spacing-lg); }
+.px-xl { padding-left: var(--spacing-xl); padding-right: var(--spacing-xl); }
+.px-xxl { padding-left: var(--spacing-xxl); padding-right: var(--spacing-xxl); }
+
+.py-0 { padding-top: 0; padding-bottom: 0; }
+.py-xs { padding-top: var(--spacing-xs); padding-bottom: var(--spacing-xs); }
+.py-sm { padding-top: var(--spacing-sm); padding-bottom: var(--spacing-sm); }
+.py-md { padding-top: var(--spacing-md); padding-bottom: var(--spacing-md); }
+.py-lg { padding-top: var(--spacing-lg); padding-bottom: var(--spacing-lg); }
+.py-xl { padding-top: var(--spacing-xl); padding-bottom: var(--spacing-xl); }
+.py-xxl { padding-top: var(--spacing-xxl); padding-bottom: var(--spacing-xxl); }
+
+/* ==========================================================
+   LAYOUT
+   ========================================================== */
+.flex { display: flex; }
+.flex-column { flex-direction: column; }
+.flex-center { display: flex; align-items: center; justify-content: center; }
+.justify-between { display: flex; align-items: center; justify-content: space-between; }
+.flex-wrap { flex-wrap: wrap; }
+.flex-1 { flex: 1; }
+.gap-xs { gap: var(--spacing-xs); }
+.gap-sm { gap: var(--spacing-sm); }
+.gap-md { gap: var(--spacing-md); }
+.gap-lg { gap: var(--spacing-lg); }
+
+/* ==========================================================
+   TEXT
+   ========================================================== */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+
+.text-sm { font-size: var(--font-size-sm); }
+.text-base { font-size: var(--font-size-base); }
+.text-md { font-size: var(--font-size-md); }
+.text-lg { font-size: var(--font-size-lg); }
+
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-secondary); }
+.text-neutral { color: var(--color-neutral-500); }
+.text-error { color: var(--color-error); }
+.text-white { color: var(--color-white); }
+
+/* ==========================================================
+   BACKGROUND
+   ========================================================== */
+.bg-light { background: var(--ion-color-light); }
+
+/* ==========================================================
+   SECTION / CONTAINER
+   ========================================================== */
+.section {
+  padding: var(--spacing-xl) var(--spacing-md);
+}
+
+.container {
+  max-width: var(--container-lg);
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-md);
+}
+
+/* ==========================================================
+   PAGE TITLE
+   ========================================================== */
+.page-title {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  color: var(--ion-color-primary);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+/* ==========================================================
+   WIDTH
+   ========================================================== */
+.w-full { width: 100%; }
+
+.max-content-width {
+  max-width: var(--container-lg);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+}
+
+.max-content-width-sm {
+  max-width: var(--container-sm);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+}
+
+.max-content-width-md {
+  max-width: var(--container-md);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+}
+
+/* ==========================================================
+   CARD COMPONENT
+   ========================================================== */
+.app-card {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  background: var(--color-white);
+  overflow: hidden;
+}
+
+.app-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-neutral-100);
+  border-bottom: 1px solid var(--color-neutral-200);
+}
+
+.app-card-header h3 {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.app-card-body {
+  padding: 0;
+}
+
+.app-card-body .app-card-item:last-child {
+  --border-width: 0;
+}
+
+.app-card-content {
+  padding: var(--spacing-md);
+}
+
+.app-card-footer {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-top: 1px solid var(--color-neutral-200);
+}
+
+/* ==========================================================
+   SECTION HEADING
+   ========================================================== */
+.info-heading {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--spacing-sm);
+}
+
+/* ==========================================================
+   FORM
+   ========================================================== */
+.form-section {
+  max-width: 480px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.form-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--spacing-sm);
+}
+
+.form-error {
+  font-size: var(--font-size-xs);
+  color: var(--color-error);
+  margin-top: var(--spacing-xs);
+}
+
+/* ==========================================================
+   FORM FIELD
+   ========================================================== */
+.field-item {
+  --background: transparent;
+  --border-color: var(--color-neutral-200);
+}
+
+.field-item.ion-invalid {
+  --border-color: var(--color-error);
+  --highlight-color: var(--color-error);
+}
+
+.required {
+  color: var(--color-error);
+}
+
+/* ==========================================================
+   WIZARD
+   ========================================================== */
+.booking-wizard {
+  display: flex;
+  flex-direction: column;
+  min-height: 400px;
+}
+
+.booking-wizard-body {
+  flex: 1;
+}
+
+.booking-wizard-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-neutral-200);
+}
+
+.booking-wizard-footer-spacer {
+  flex: 1;
+}
+
+.booking-step {
+  max-width: 600px;
+}
+
+.booking-step-sm {
+  max-width: 480px;
+}
+
+/* ==========================================================
+   STEP HEADER
+   ========================================================== */
+.step-title {
+  font-size: 1.3rem;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.step-description {
+  color: var(--color-neutral-500);
+  margin-bottom: var(--spacing-lg);
+}
+
+/* ==========================================================
+   SUMMARY
+   ========================================================== */
+.booking-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 600px;
+}
+
+.summary-section {
+  border: 1px solid var(--color-neutral-200);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.summary-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-neutral-100);
+  border-bottom: 1px solid var(--color-neutral-200);
+}
+
+.summary-section-header h3 {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.summary-section-body {
+  padding: 0;
+}
+
+.summary-thumbnail {
+  --size: 100px;
+  --border-radius: var(--radius-md);
+}
+
+/* ==========================================================
+   CONFIRMATION
+   ========================================================== */
+.booking-confirmation {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.confirm-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  text-align: center;
+}
+
+.confirm-state-loading {
+  padding: var(--spacing-xxl) 0;
+  color: var(--color-neutral-500);
+}
+
+.confirm-state-error {
+  padding: var(--spacing-xl) 0;
+}
+
+.confirm-state-error h2 {
+  color: var(--color-error);
+}
+
+.confirm-state-empty {
+  padding: var(--spacing-xxl) 0;
+  color: var(--color-neutral-500);
+}
+
+.success-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.success-header h2 {
+  color: var(--color-success);
+  font-size: 1.4rem;
+}
+
+.total-value {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}

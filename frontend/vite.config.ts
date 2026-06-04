@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
@@ -16,6 +17,15 @@ export default defineConfig({
         target: 'http://localhost:8080',
         changeOrigin: true,
       },
+      '/images': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
     },
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    include: ['src/**/*.spec.ts'],
   },
 });

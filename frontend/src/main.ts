@@ -14,6 +14,7 @@ import '@ionic/vue/css/flex-utils.css';
 import '@ionic/vue/css/display.css';
 
 import './theme/variables.css';
+import './theme/utilities.css';
 
 import App from './App.vue';
 import router from './router';

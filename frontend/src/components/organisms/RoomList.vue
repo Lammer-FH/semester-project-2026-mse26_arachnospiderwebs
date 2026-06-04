@@ -9,14 +9,16 @@
     <div v-else-if="rooms.length === 0" class="center-content">
       <IonText color="medium">Keine Zimmer gefunden.</IonText>
     </div>
-    <div v-else class="rooms-grid">
-      <RoomCard
-        v-for="room in rooms"
-        :key="room.id"
-        :room="room"
-        @select="$emit('select', $event)"
-      />
-    </div>
+    <IonGrid v-else class="ion-no-padding">
+      <IonRow>
+        <IonCol size="12" size-md="6" size-lg="4" v-for="room in rooms" :key="room.id">
+          <RoomCard
+            :room="room"
+            @select="$emit('select', $event)"
+          />
+        </IonCol>
+      </IonRow>
+    </IonGrid>
     <PaginationBar
       v-if="totalPages > 1"
       :current="currentPage"
@@ -30,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonSpinner, IonText } from '@ionic/vue';
+import { IonSpinner, IonText, IonGrid, IonRow, IonCol } from '@ionic/vue';
 import RoomCard from '@/components/molecules/RoomCard.vue';
 import PaginationBar from '@/components/molecules/PaginationBar.vue';
 import type { Room } from '@/types/room';
@@ -54,19 +56,5 @@ defineEmits<{ select: [id: number]; prev: []; next: [] }>();
   justify-content: center;
   padding: 48px 0;
 }
-.rooms-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-}
-@media (min-width: 768px) {
-  .rooms-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (min-width: 1200px) {
-  .rooms-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
+
 </style>

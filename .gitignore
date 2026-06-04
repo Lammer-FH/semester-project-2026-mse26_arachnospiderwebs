@@ -47,6 +47,10 @@ Thumbs.db
 *.log
 npm-debug.log*
 
+# --- Playwright ---
+e2e-report/
+test-results/
+
 # --- Misc ---
 HELP.md
 out/
