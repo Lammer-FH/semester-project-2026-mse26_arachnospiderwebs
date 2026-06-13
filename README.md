@@ -4,28 +4,32 @@ Semester project for *Advanced Webtechnologies* (MSE 2026).
 
 ## Prerequisites
 
-| Tool      | Version | Notes                              |
-|-----------|---------|------------------------------------|
-| Java JDK  | ≥26     | Backend (Spring Boot)              |
-| Node.js   | ≥22     | Frontend (Vue + Ionic)             |
-| SQLite CLI| ≥3.47   | Database initialisation (`sqlite3` on PATH) |
+| Tool          | Version | Notes                              |
+|---------------|---------|------------------------------------|
+| Java JDK      | ≥26     | Backend (Spring Boot)              |
+| Node.js       | ≥22     | Frontend (Vue + Ionic)             |
+| MySQL Server  | ≥8.0    | Database (running on `localhost:3306`) |
 
 Verify with:
 ```bash
 java -version
 node --version
-sqlite3 --version
+mysql --version
 ```
 
 ## Quick Start
 
+Install [MySQL Community Server 8](https://dev.mysql.com/downloads/mysql/) and make sure it is running. Then one command sets up everything — database + application user, frontend deps, backend build (uses the MySQL root password you chose during installation):
+
 ```bash
 # One-time setup: DB + frontend deps + backend build
-./gradlew setup
+./gradlew setup "-ProotPassword=YOUR_ROOT_PASSWORD"
 
 # Start backend (8080) + frontend (5173) concurrently
 ./gradlew start
 ```
+
+The schema and seed data are created automatically by Flyway on first backend startup — no manual import needed. The connection defaults to `jdbc:mysql://localhost:3306/hotel_booking` with user/password `hotel`/`hotel` and can be overridden via environment variables: `DB_URL`, `DB_USERNAME`, `DB_PASSWORD`.
 
 Then open http://localhost:5173 in your browser.
 
@@ -35,8 +39,9 @@ All commands run from the project root using `./gradlew <task>`.
 
 | Command                    | Description                                  |
 |----------------------------|----------------------------------------------|
-| `./gradlew setup`          | Full one-shot setup (DB + deps + build)      |
-| `./gradlew dbInit`         | Delete old SQLite database (Flyway auto-migrates on next startup) |
+| `./gradlew setup`          | Full one-shot setup: DB + deps + build (`-ProotPassword=...`) |
+| `./gradlew dbSetup`        | DB only: create MySQL database + app user (`-ProotPassword=...`) |
+| `./gradlew dbReset`        | Drop all tables in the MySQL database (Flyway re-migrates on next startup) |
 | `./gradlew frontendInstall`| Install npm dependencies for the frontend     |
 | `./gradlew start`          | Start backend + frontend concurrently         |
 | `./gradlew startBackend`   | Start only the Spring Boot backend (blocking) |
@@ -79,7 +84,7 @@ The app uses two layers of CSS on top of Ionic's built-in design system.
 
 ## Database
 
-The schema is managed via [Flyway](https://flywaydb.org/) migrations in `backend/src/main/resources/db/migration/`. Production uses SQLite, tests run against H2 in-memory using the same migration.
+The schema is managed via [Flyway](https://flywaydb.org/) migrations in `backend/src/main/resources/db/migration/`. Production uses MySQL 8, tests run against H2 in-memory (MySQL compatibility mode) using the same migration.
 
 ```mermaid
 erDiagram
@@ -100,7 +105,7 @@ erDiagram
         INTEGER extra_id FK
     }
     booking {
-        TEXT id PK
+        VARCHAR id PK
         INTEGER room_id FK
         VARCHAR first_name
         VARCHAR last_name
@@ -143,7 +148,7 @@ Result > 0 → room is occupied. (The `<=` / `>=` comparison correctly handles s
 ### Build & rebuild
 
 ```bash
-./gradlew dbInit      # delete old DB files (Flyway auto-migrates on next app startup)
-./gradlew :backend:test # runs against H2 in-memory, uses the same Flyway migration
+./gradlew dbReset       # drop all tables (Flyway re-migrates on next app startup)
+./gradlew :backend:test # runs against H2 in-memory (MySQL mode), uses the same Flyway migration
 ```
 

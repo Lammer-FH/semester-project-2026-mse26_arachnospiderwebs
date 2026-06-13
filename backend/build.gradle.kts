@@ -1,3 +1,13 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath("org.flywaydb:flyway-mysql:11.14.1")
+    classpath("com.mysql:mysql-connector-j:9.3.0")
+  }
+}
+
 plugins {
   java
   id("org.springframework.boot") version "4.0.6"
@@ -22,10 +32,10 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("org.springframework.boot:spring-boot-starter-web")
-  implementation("org.xerial:sqlite-jdbc:3.47.1.0")
-  implementation("org.hibernate.orm:hibernate-community-dialects")
+  runtimeOnly("com.mysql:mysql-connector-j")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
   implementation("org.flywaydb:flyway-core")
+  implementation("org.flywaydb:flyway-mysql")
   compileOnly("org.projectlombok:lombok")
   annotationProcessor("org.projectlombok:lombok")
 
@@ -45,9 +55,12 @@ tasks.withType<Test> {
 }
 
 flyway {
-  url = "jdbc:sqlite:backend.db"
+  url = System.getenv("DB_URL") ?: "jdbc:mysql://localhost:3306/hotel_booking?createDatabaseIfNotExist=true"
+  user = System.getenv("DB_USERNAME") ?: "hotel"
+  password = System.getenv("DB_PASSWORD") ?: "hotel"
   locations = arrayOf("filesystem:src/main/resources/db/migration")
   baselineOnMigrate = true
   baselineVersion = "0"
+  cleanDisabled = false
   configurations = arrayOf("runtimeClasspath")
 }

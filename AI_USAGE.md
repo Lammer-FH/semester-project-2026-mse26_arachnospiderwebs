@@ -54,3 +54,13 @@
 ### 9 · DB_Design.md erstellen
 **Task:** Aktualisierte `DB_Design.md` basierend auf API v2 und SQLite-Schema erstellen  
 **Result:** ✅ Vollständig akzeptiert
+
+### 10 · MySQL 8 als Datenbank einrichten
+**Task:** Backend-Setup auf MySQL aufsetzen  
+**Result:** ✅ Vollständig akzeptiert  
+- ✅ `build.gradle.kts` (backend): `mysql-connector-j` als JDBC-Treiber + `flyway-mysql` für die Migrationen
+- ✅ Flyway-Migration MySQL-kompatibel aufgesetzt: `AUTO_INCREMENT` für Primärschlüssel, explizite `FOREIGN KEY` Constraints, `CREATE INDEX` ohne `IF NOT EXISTS` (von MySQL nicht unterstützt)
+- ✅ Indizes auf `booking` (Datum, E-Mail, Status); FK-Spalten indiziert InnoDB automatisch
+- ✅ Gradle-Task `dbReset` (`flywayClean`) zum Zurücksetzen aller Tabellen
+- ✅ Gradle-Task `dbSetup` (`-ProotPassword=…`): legt Datenbank `hotel_booking` + User `hotel` idempotent per JDBC an (Ein-Befehl-Setup statt manuellem `CREATE DATABASE`/`CREATE USER`)
+- ✅ README: MySQL-Setup, Env-Variablen `DB_URL`/`DB_USERNAME`/`DB_PASSWORD` dokumentiert

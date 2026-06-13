@@ -1,16 +1,16 @@
 -- ============================================================
 -- V1: Initial schema - rooms, extras, bookings
--- Cross-database compatible (SQLite + H2)
+-- Cross-database compatible (MySQL 8 + H2)
 -- ============================================================
 
 CREATE TABLE IF NOT EXISTS extra (
-    id   INTEGER       PRIMARY KEY,
+    id   INTEGER       PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(100)  NOT NULL UNIQUE,
     icon VARCHAR(100)  NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS room (
-    id               INTEGER        PRIMARY KEY,
+    id               INTEGER        PRIMARY KEY AUTO_INCREMENT,
     title            VARCHAR(255)   NOT NULL,
     description      VARCHAR(4000)  NOT NULL,
     image_url        VARCHAR(512)   NOT NULL,
@@ -18,14 +18,16 @@ CREATE TABLE IF NOT EXISTS room (
 );
 
 CREATE TABLE IF NOT EXISTS room_extra (
-    room_id  INTEGER NOT NULL REFERENCES room(id)  ON DELETE CASCADE,
-    extra_id INTEGER NOT NULL REFERENCES extra(id) ON DELETE CASCADE,
-    PRIMARY KEY (room_id, extra_id)
+    room_id  INTEGER NOT NULL,
+    extra_id INTEGER NOT NULL,
+    PRIMARY KEY (room_id, extra_id),
+    CONSTRAINT fk_room_extra_room  FOREIGN KEY (room_id)  REFERENCES room(id)  ON DELETE CASCADE,
+    CONSTRAINT fk_room_extra_extra FOREIGN KEY (extra_id) REFERENCES extra(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS booking (
     id          VARCHAR(36)   PRIMARY KEY,
-    room_id     INTEGER       NOT NULL REFERENCES room(id),
+    room_id     INTEGER       NOT NULL,
     first_name  VARCHAR(100)  NOT NULL,
     last_name   VARCHAR(100)  NOT NULL,
     email       VARCHAR(255)  NOT NULL,
@@ -36,13 +38,13 @@ CREATE TABLE IF NOT EXISTS booking (
     status      VARCHAR(20)   NOT NULL DEFAULT 'CONFIRMED'
                               CHECK (status IN ('CONFIRMED', 'CANCELLED')),
     created_at  TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_booking_room FOREIGN KEY (room_id) REFERENCES room(id),
     CHECK (check_out >= check_in)
 );
 
-CREATE INDEX IF NOT EXISTS idx_booking_room_id  ON booking(room_id);
-CREATE INDEX IF NOT EXISTS idx_booking_dates    ON booking(check_in, check_out);
-CREATE INDEX IF NOT EXISTS idx_booking_email    ON booking(email);
-CREATE INDEX IF NOT EXISTS idx_booking_status   ON booking(status);
+CREATE INDEX idx_booking_dates    ON booking(check_in, check_out);
+CREATE INDEX idx_booking_email    ON booking(email);
+CREATE INDEX idx_booking_status   ON booking(status);
 
 -- Seed extras
 INSERT INTO extra (id, name, icon) VALUES (1, 'WiFi',         'wifi');
