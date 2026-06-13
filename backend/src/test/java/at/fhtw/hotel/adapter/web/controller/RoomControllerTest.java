@@ -64,7 +64,7 @@ class RoomControllerTest extends BaseIntegrationTest {
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id").value(1))
         .andExpect(jsonPath("$.title").value("Deluxe Suite"))
-        .andExpect(jsonPath("$.imageUrl", startsWith("https://")))
+        .andExpect(jsonPath("$.imageUrl", startsWith("/images/rooms/")))
         .andExpect(jsonPath("$.extras", hasSize(greaterThan(0))))
         .andExpect(jsonPath("$.availability").doesNotExist());
   }
