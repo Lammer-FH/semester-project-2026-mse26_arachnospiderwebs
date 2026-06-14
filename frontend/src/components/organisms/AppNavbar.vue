@@ -2,7 +2,7 @@
   <IonHeader>
     <IonToolbar color="primary">
       <IonButtons slot="start">
-        <IonMenuButton v-if="showMenu" />
+        <IonMenuButton v-if="showMenu" menu="main-menu" class="menu-btn" />
         <IonBackButton v-else default-href="/rooms" />
       </IonButtons>
       <IonTitle>
@@ -37,6 +37,9 @@ withDefaults(defineProps<{ showMenu?: boolean }>(), { showMenu: true });
 @media (min-width: 768px) {
   .nav-links {
     display: flex;
+  }
+  .menu-btn {
+    display: none;
   }
 }
 </style>
